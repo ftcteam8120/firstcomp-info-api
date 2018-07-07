@@ -1,55 +1,56 @@
 import * as IORedis from 'ioredis';
+import { Service } from 'typedi';
 
-/**
- * The primary Redis connection
- */
-export let redis: IORedis.Redis;
+@Service()
+export class RedisCache {
+  private static redis: IORedis.Redis;
 
-/**
- * Connects to Redis
- * @param url The Redis URL
- */
-export function connectToRedis(url: string) {
-  redis = new IORedis(url);
-}
+  /**
+   * Connects to Redis
+   * @param url The Redis URL
+   */
+  public static connect(url: string) {
+    RedisCache.redis = new IORedis(url);
+  }
 
-/**
- * Generates a Redis key
- * @param type The type of the object
- * @param idComponents Parts of the object's primary key
- */
-function makeKey(type: string, idComponents: string[]) {
-  return type + '-' + idComponents.join('-');
-}
+  /**
+   * Generates a Redis key
+   * @param type The type of the object
+   * @param idComponents Parts of the object's primary key
+   */
+  private makeKey(type: string, idComponents: string[]) {
+    return type + '-' + idComponents.join('-');
+  }
 
-/**
- * Caches a single object in Redis
- * @param type The type of the object
- * @param idComponents Parts of the object's primary key
- * @param value The object itself
- * @param expire (optional, default is 3600) Expiration (in seconds)
- */
-export async function cache(
-  type: string,
-  idComponents: string[],
-  value: any,
-  expire: number = 3600
-) {
-  const val = JSON.stringify(value);
-  const key = makeKey(type, idComponents);
-  await redis.set(key, val);
-  await redis.expire(key, expire);
-}
+  /**
+   * Caches a single object in Redis
+   * @param type The type of the object
+   * @param idComponents Parts of the object's primary key
+   * @param value The object itself
+   * @param expire (optional, default is 3600) Expiration (in seconds)
+   */
+  public async set(
+    type: string,
+    idComponents: string[],
+    value: any,
+    expire: number = 3600
+  ) {
+    const val = JSON.stringify(value);
+    const key = this.makeKey(type, idComponents);
+    await RedisCache.redis.set(key, val);
+    await RedisCache.redis.expire(key, expire);
+  }
 
-/**
- * Gets a cached object
- * @param type The type of the object
- * @param idComponents Parts of the object's primary key
- */
-export async function getCached<T>(type: string, idComponents: string[]): Promise<T> {
-  const key = makeKey(type, idComponents);
-  return redis.get(key).then((value) => {
-    if (!value) return null;
-    return JSON.parse(value);
-  });
+  /**
+   * Gets a cached object
+   * @param type The type of the object
+   * @param idComponents Parts of the object's primary key
+   */
+  public async get<T>(type: string, idComponents: string[]): Promise<T> {
+    const key = this.makeKey(type, idComponents);
+    return RedisCache.redis.get(key).then((value) => {
+      if (!value) return null;
+      return JSON.parse(value);
+    });
+  }
 }

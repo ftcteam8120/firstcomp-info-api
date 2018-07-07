@@ -10,10 +10,10 @@ if (process.env.NODE_ENV !== 'prod') {
 const REDIS_URL = process.env.REDIS_URL;
 const PORT = parseInt(process.env.PORT, 2) || 3000;
 
-import { connectToRedis } from './util/redisCache';
+import { RedisCache } from './util/RedisCache';
 
 // Connect to the Redis database
-connectToRedis(REDIS_URL);
+RedisCache.connect(REDIS_URL);
 
 // Import controllers
 import { UserController } from './controller/UserController';
