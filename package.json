@@ -1,0 +1,39 @@
+{
+  "name": "firstcomp-info-api",
+  "version": "0.0.1",
+  "description": "The backend GraphQL API for FIRSTComp.info",
+  "main": "src/index.ts",
+  "author": "FTC Team 8120",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx nodemon",
+    "build": "npx rimraf build && npx tsc",
+    "prod": "npx rimraf build && npx tsc && node ./build/index",
+    "container-remove": "docker rm firstcomp-info-api",
+    "container-build": "npm run build && docker build -t firstcomp-info-api .",
+    "container-run": "docker run -p 80:80 --name=firstcomp-info-api firstcomp-info-api",
+    "container": "npm run container-remove && npm run container-run",
+    "test": "npx mocha -r ts-node/register test/**.ts"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.0",
+    "dotenv": "^6.0.0",
+    "ioredis": "^3.2.2",
+    "node-fetch": "^2.1.2",
+    "pg": "^7.4.3",
+    "vesper": "^0.1.9"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^2.0.0",
+    "@types/dotenv": "^4.0.3",
+    "@types/ioredis": "^3.2.11",
+    "@types/node-fetch": "^2.1.1",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.17.5",
+    "sinon": "^6.1.2",
+    "ts-node": "^7.0.0",
+    "tslint": "^5.10.0",
+    "tslint-config-airbnb": "^5.9.2",
+    "typescript": "^2.9.2"
+  }
+}

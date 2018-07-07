@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "name": "firstcomp-info-api",
+      "script": "./build/index.js",
+      "watch": true,
+      "env": {
+        "NODE_ENV": "prod"
+      }
+    }
+  ]
+}

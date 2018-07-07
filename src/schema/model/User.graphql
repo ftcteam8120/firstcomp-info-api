@@ -1,0 +1,9 @@
+type User {
+  id: String
+  firstName: String
+  lastName: String
+  email: String
+  provider: String
+  photoUrl: String
+  providerId: String
+}

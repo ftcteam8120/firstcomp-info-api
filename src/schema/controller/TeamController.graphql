@@ -1,0 +1,4 @@
+type Query {
+  teams: [Team]
+  team(program: Program!, number: Int!): Team
+}

@@ -1,0 +1,22 @@
+enum Program {
+  JFLL
+  FLL
+  FTC
+  FRC
+}
+
+type Team {
+  program: Program!
+  number: Int!
+  homeCmp: String
+  nameFull: String
+  nameShort: String
+  schoolName: String
+  city: String
+  stateProv: String
+  country: String
+  rookieYear: Int
+  robotName: String
+  districtCode: String
+  website: String
+}
