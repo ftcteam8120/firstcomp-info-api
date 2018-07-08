@@ -1,20 +1,17 @@
 import { Controller, Query } from 'vesper';
-import { EntityManager } from 'typeorm';
 import { Team } from '../entity/Team';
+import { TeamRepository } from '../repository/TeamRepository';
 
 @Controller()
 export class TeamController {
 
-  constructor(private entityManager : EntityManager) {}
-
-  @Query()
-  teams() {
-    return this.entityManager.find(Team);
-  }
+  constructor(
+    private teamRepository: TeamRepository
+  ) { }
 
   @Query()
   team({ program, number }) {
-    return this.entityManager.findOne(Team, { program, number });
+    return this.teamRepository.findByNumber(program, number);
   }
 
 }

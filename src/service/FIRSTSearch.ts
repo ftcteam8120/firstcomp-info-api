@@ -17,7 +17,7 @@ export class FIRSTSearch {
    * @param number The team number
    * @param program The team program
    */
-  public async findTeam(number: number, program: Program): Promise<Team> {
+  public async findTeam(program: Program, number: number): Promise<Team> {
     // Check for a cached value
     const cached = await this.redisCache.get<Team>('team', [program, number.toString()]);
     if (cached) return cached;
