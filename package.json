@@ -27,6 +27,7 @@
     "@types/bcrypt": "^2.0.0",
     "@types/dotenv": "^4.0.3",
     "@types/ioredis": "^3.2.11",
+    "@types/lodash": "^4.14.110",
     "@types/node-fetch": "^2.1.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",

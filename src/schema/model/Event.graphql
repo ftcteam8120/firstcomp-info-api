@@ -1,0 +1,36 @@
+enum EventType {
+  KICKOFF
+  WORKSHOP
+  SCRIMMAGE
+  INTERVIEW_ONLY
+  MEET
+  QUALIFYING_EVENT
+  _2ND_TIER_QUALIFYING_EVENT
+  SUPER_REGIONAL
+  REGIONAL
+  DISTRICT_EVENT
+  DISTRICT_CHAMPIONSHIP
+  DISTRICT_CHAMPIONSHIP_WITH_LEVELS
+  DISTRICT_CHAMPIONSHIP_DIVISION
+  CHAMPIONSHIP_SUBDIVISION
+  CHAMPIONSHIP_DIVISION
+  CHAMPIONSHIP
+  WORLD_FESTIVAL
+  OFF_SEASON
+  OFF_SEASON_WITH_AZURE_SYNC
+}
+
+type Event {
+  code: String!
+  address: String
+  name: String!
+  venue: String
+  city: String
+  country: String
+  stateProv: String
+  dateStart: String
+  dateEnd: String
+  type: EventType
+  website: String
+  program: Program
+}

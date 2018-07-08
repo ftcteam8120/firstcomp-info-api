@@ -18,6 +18,7 @@ RedisCache.connect(REDIS_URL);
 // Import controllers
 import { UserController } from './controller/UserController';
 import { TeamController } from './controller/TeamController';
+import { EventController } from './controller/EventController';
 
 // Import entities
 import { User } from './entity/User';
@@ -31,7 +32,8 @@ bootstrap({
   port: PORT,
   controllers: [
     UserController,
-    TeamController
+    TeamController,
+    EventController
   ],
   entities: [
     User,

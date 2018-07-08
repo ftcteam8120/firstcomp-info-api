@@ -21,6 +21,8 @@ export class ElasticSearch {
       .then(res => res.json())
       // Extract the hits
       .then((json) => {
+        // Return an empty array if there are no hits
+        if (!json.hits) return [];
         const rawHits = json.hits.hits;
         const hits = [];
         rawHits.forEach((hit) => {

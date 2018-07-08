@@ -4,25 +4,25 @@ import { Match } from './Match';
 import { User } from './User';
 
 export enum EventType {
-  KICKOFF = 'Kickoff',
-  WORKSHOP = 'Workshop',
-  SCRIMMAGE = 'Scrimmage',
-  INTERVIEW_ONLY = 'InterviewOnly',
-  MEET = 'Meet',
-  QUALIFYING_EVENT = 'QualifyingEvent',
-  _2ND_TIER_QUALIFYING_EVENT = '2ndTierQualifyingEvent',
-  SUPER_REGIONAL = 'SuperRegional',
-  REGIONAL = 'Regional',
-  DISTRICT_EVENT = 'DistrictEvent',
-  DISTRICT_CHAMPIONSHIP = 'DistrictChampionship',
-  DISTRICT_CHAMPIONSHIP_WITH_LEVELS = 'DistrictChampionshipWithLevels',
-  DISTRICT_CHAMPIONSHIP_DIVISION = 'DistrictChampionshipDivision',
-  CHAMPIONSHIP_SUBDIVISION = 'ChampionshipSubdivision',
-  CHAMPIONSHIP_DIVISION = 'ChampionshipDivision',
-  CHAMPIONSHIP = 'Championship',
-  WORLD_FESTIVAL = 'WorldFestival',
-  OFF_SEASON = 'OffSeason',
-  OFF_SEASON_WITH_AZURE_SYNC = 'OffSeasonWithAzureSync'
+  KICKOFF = 'KICKOFF',
+  WORKSHOP = 'WORKSHOP',
+  SCRIMMAGE = 'SCRIMMAGE',
+  INTERVIEW_ONLY = 'INTERVIEW_ONLY',
+  MEET = 'MEET',
+  QUALIFYING_EVENT = 'QUALIFYING_EVENT',
+  _2ND_TIER_QUALIFYING_EVENT = '_2ND_TIER_QUALIFYING_EVENT',
+  SUPER_REGIONAL = 'SUPER_REGIONAL',
+  REGIONAL = 'REGIONAL',
+  DISTRICT_EVENT = 'DISTRICT_EVENT',
+  DISTRICT_CHAMPIONSHIP = 'DISTRICT_CHAMPIONSHIP',
+  DISTRICT_CHAMPIONSHIP_WITH_LEVELS = 'DISTRICT_CHAMPIONSHIP_WITH_LEVELS',
+  DISTRICT_CHAMPIONSHIP_DIVISION = 'DISTRICT_CHAMPIONSHIP_DIVISION',
+  CHAMPIONSHIP_SUBDIVISION = 'CHAMPIONSHIP_SUBDIVISION',
+  CHAMPIONSHIP_DIVISION = 'CHAMPIONSHIP_DIVISION',
+  CHAMPIONSHIP = 'CHAMPIONSHIP',
+  WORLD_FESTIVAL = 'WORLD_FESTIVAL',
+  OFF_SEASON = 'OFF_SEASON',
+  OFF_SEASON_WITH_AZURE_SYNC = 'OFF_SEASON_WITH_AZURE_SYNC'
 }
 
 @Entity()
@@ -33,42 +33,42 @@ export class Event {
 
   @ManyToMany(type => User)
   @JoinTable()
-  admins: User[];
+  admins?: User[];
 
   @Column({ nullable: true })
-  address: string;
+  address?: string;
 
   @Column()
   name: string;
 
   @Column({ nullable: true })
-  venue: string;
+  venue?: string;
 
   @Column({ nullable: true })
-  city: string;
+  city?: string;
 
   @Column({ nullable: true })
-  country: string;
+  country?: string;
 
   @Column({ nullable: true })
-  stateProv: string;
+  stateProv?: string;
 
   @Column({ type: 'date', nullable: true })
-  dateStart: Date;
+  dateStart?: string;
 
   @Column({ type: 'date', nullable: true })
-  dateEnd: Date;
+  dateEnd?: string;
 
   @Column({ enum: EventType, nullable: true })
-  type: EventType;
+  type?: EventType;
 
   @Column({ nullable: true })
-  website: string;
+  website?: string;
 
-  @Column({ enum: Program, nullable: true })
+  @Column({ enum: Program })
   program: Program;
 
   @OneToMany(type => Match, match => match.event)
-  matches: Match[];
+  matches?: Match[];
 
 }
