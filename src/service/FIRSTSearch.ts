@@ -39,6 +39,7 @@ export class FIRSTSearch {
       }
       const teamRaw = results[0];
       const team: Team = {
+        id: teamRaw.id,
         number: teamRaw.team_number_yearly,
         program: teamRaw.team_type,
         nameFull: teamRaw.team_nickname,
@@ -63,13 +64,14 @@ export class FIRSTSearch {
    */
   public convertEventType(input: string): EventType {
     // Remove all spaces from the event type and capitalize
-    let processed = input.replace(' ', '_').toUpperCase();
+    let processed = input.replace(' / ', '_').replace(' ', '_').toUpperCase();
     try {
       // Check if the first character is a number
-      parseInt(processed[0], 2);
-      // If it is, add a leading underscore
-      processed = '_' + processed;
-    } catch {}
+      if (parseInt(processed[0], 2)) {
+        // If it is, add a leading underscore
+        processed = '_' + processed;
+      }
+    } catch { }
     for (const type in EventType) {
       // Check against the enum values
       if (EventType[type] === processed) return EventType[type] as EventType;
@@ -99,6 +101,7 @@ export class FIRSTSearch {
       }
       const eventRaw = results[0];
       const event: Event = {
+        id: eventRaw.id,
         code: eventRaw.event_code,
         name: eventRaw.event_name,
         address: eventRaw.event_address1 +

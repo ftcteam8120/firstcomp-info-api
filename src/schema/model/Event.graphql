@@ -18,9 +18,13 @@ enum EventType {
   WORLD_FESTIVAL
   OFF_SEASON
   OFF_SEASON_WITH_AZURE_SYNC
+  OFFICIAL_EXPO
+  TRAINING_EDUCATION
+  DISPLAY_DEMONSTRATION
 }
 
 type Event {
+  id: Int
   code: String!
   address: String
   name: String!

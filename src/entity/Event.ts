@@ -22,11 +22,16 @@ export enum EventType {
   CHAMPIONSHIP = 'CHAMPIONSHIP',
   WORLD_FESTIVAL = 'WORLD_FESTIVAL',
   OFF_SEASON = 'OFF_SEASON',
-  OFF_SEASON_WITH_AZURE_SYNC = 'OFF_SEASON_WITH_AZURE_SYNC'
+  OFF_SEASON_WITH_AZURE_SYNC = 'OFF_SEASON_WITH_AZURE_SYNC',
+  OFFICIAL_EXPO = 'OFFICIAL_EXPO',
+  TRAINING_EDUCATION = 'TRAINING_EDUCATION',
+  DISPLAY_DEMONSTRATION = 'DISPLAY_DEMONSTRATION'
 }
 
 @Entity()
 export class Event {
+
+  id?: number;
 
   @PrimaryColumn()
   code: string;
@@ -40,6 +45,9 @@ export class Event {
 
   @Column()
   name: string;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @Column({ nullable: true })
   venue?: string;

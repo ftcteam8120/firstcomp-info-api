@@ -10,6 +10,8 @@ export enum Program {
 @Entity()
 export class Team {
 
+  id?: number;
+
   @PrimaryColumn({ enum: Program })
   program: Program;
 

@@ -6,6 +6,7 @@ enum Program {
 }
 
 type Team {
+  id: Int
   program: Program!
   number: Int!
   homeCmp: String
