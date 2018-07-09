@@ -5,8 +5,8 @@ enum Program {
   FRC
 }
 
-type Team {
-  id: Int
+type Team implements Node {
+  id: ID!
   program: Program!
   number: Int!
   homeCmp: String
@@ -20,4 +20,14 @@ type Team {
   robotName: String
   districtCode: String
   website: String
+}
+
+type TeamEdge {
+  cursor: String!
+  node: Team
+}
+
+type TeamConnection {
+  edges: [TeamEdge]
+  pageInfo: PageInfo!
 }

@@ -19,6 +19,7 @@ RedisCache.connect(REDIS_URL);
 import { UserController } from './controller/UserController';
 import { TeamController } from './controller/TeamController';
 import { EventController } from './controller/EventController';
+import { NodeController } from './controller/NodeController';
 
 // Import entities
 import { User } from './entity/User';
@@ -27,10 +28,13 @@ import { Match } from './entity/Match';
 import { Team } from './entity/Team';
 import { MatchTeam } from './entity/MatchTeam';
 
+import { resolveType } from './entity/Node';
+
 // Start vesper
 bootstrap({
   port: PORT,
   controllers: [
+    NodeController,
     UserController,
     TeamController,
     EventController
@@ -42,9 +46,14 @@ bootstrap({
     Team,
     MatchTeam
   ],
+  customResolvers: {
+    Node: {
+      __resolveType: data => resolveType(data),
+    }
+  },
   playground: process.env.NODE_ENV !== 'prod',
   schemas: [__dirname + '/schema/**/*.graphql'],
-  cors: true
+  cors: true,
 }).then(() => {
   console.log(`App started on port ${PORT}`);
 }).catch((error) => {

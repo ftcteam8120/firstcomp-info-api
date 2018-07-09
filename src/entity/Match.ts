@@ -1,14 +1,17 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinTable, OneToMany } from 'typeorm';
 import { Event } from './Event';
 import { MatchTeam } from './MatchTeam';
+import { Node } from './Node';
 
 @Entity()
-export class Match {
+export class Match implements Node {
 
   @PrimaryColumn()
+  id: string;
+
+  @Column()
   number: string;
 
-  @PrimaryColumn({ type: 'varchar' })
   @ManyToOne(type => Event, event => event.matches)
   event: Event;
 

@@ -1,3 +1,4 @@
 type Query {
-  team(program: Program!, number: Int!): Team
+  team(id: ID!): Team
+  teamByNumber(program: Program!, number: Int!): Team
 }

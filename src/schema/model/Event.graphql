@@ -23,11 +23,12 @@ enum EventType {
   DISPLAY_DEMONSTRATION
 }
 
-type Event {
-  id: Int
+type Event implements Node {
+  id: ID!
   code: String!
   address: String
   name: String!
+  description: String
   venue: String
   city: String
   country: String
@@ -37,4 +38,14 @@ type Event {
   type: EventType
   website: String
   program: Program
+}
+
+type EventEdge {
+  cursor: String!
+  node: Event
+}
+
+type EventConnection {
+  edges: [EventEdge]
+  pageInfo: PageInfo!
 }

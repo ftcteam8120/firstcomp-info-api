@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
 import { Match } from './Match';
 import { Team } from './Team';
+import { Node } from './Node';
 
 export enum Station {
   BLUE1 = 'Blue1',
@@ -12,13 +13,14 @@ export enum Station {
 }
 
 @Entity()
-export class MatchTeam {
+export class MatchTeam implements Node {
 
-  @PrimaryColumn({ type: 'varchar' })
+  @PrimaryColumn()
+  id: string;
+
   @ManyToOne(type => Match, match => match.teams)
   match: Match;
 
-  @PrimaryColumn({ type: 'varchar' })
   @OneToOne(type => Team)
   @JoinColumn()
   team: Team;

@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany, ManyToMany, JoinTable, Index } from 'typeorm';
 import { Program } from './Team';
 import { Match } from './Match';
 import { User } from './User';
+import { Node } from './Node';
 
 export enum EventType {
   KICKOFF = 'KICKOFF',
@@ -29,11 +30,13 @@ export enum EventType {
 }
 
 @Entity()
-export class Event {
-
-  id?: number;
+export class Event implements Node {
 
   @PrimaryColumn()
+  id: string;
+
+  @Index()
+  @Column()
   code: string;
 
   @ManyToMany(type => User)

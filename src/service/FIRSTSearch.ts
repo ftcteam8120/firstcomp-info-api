@@ -3,29 +3,31 @@ import { RedisCache } from '../util/RedisCache';
 import { Event, EventType } from '../entity/Event';
 import { Team, Program } from '../entity/Team';
 import { ElasticSearch } from '../util/ElasticSearch';
+import { IDGenerator } from '../util/IDGenerator';
 
 @Service()
 export class FIRSTSearch {
 
   constructor(
     private redisCache: RedisCache,
-    private elasticSearch: ElasticSearch
+    private elasticSearch: ElasticSearch,
+    private idGenerator: IDGenerator
   ) { }
   
   /**
    * Finds a FIRST team
-   * @param number The team number
-   * @param program The team program
+   * @param id The team ID
    */
-  public async findTeam(program: Program, number: number): Promise<Team> {
+  public async findTeam(id: string): Promise<Team> {
     // Check for a cached value
-    const cached = await this.redisCache.get<Team>('team', [program, number.toString()]);
+    const cached = await this.redisCache.get<Team>(id);
+    const teamData = this.idGenerator.decodeTeam(id);
     if (cached) return cached;
     // Otherwise, query the server
     return this.elasticSearch.query('https://es01.usfirst.org/teams/_search', {
       query: {
         query_string: {
-          query: `team_number_yearly: ${number} AND team_type: ${program}`
+          query: `team_number_yearly: ${teamData.number} AND team_type: ${teamData.program}`
         }
       },
       sort: {
@@ -39,7 +41,7 @@ export class FIRSTSearch {
       }
       const teamRaw = results[0];
       const team: Team = {
-        id: teamRaw.id,
+        id,
         number: teamRaw.team_number_yearly,
         program: teamRaw.team_type,
         nameFull: teamRaw.team_nickname,
@@ -52,7 +54,7 @@ export class FIRSTSearch {
         website: teamRaw.team_web_url
       };
       // Cache the team
-      return this.redisCache.set('team', [program, number.toString()], team).then(() => {
+      return this.redisCache.set(team).then(() => {
         return team;
       });
     });
@@ -82,17 +84,18 @@ export class FIRSTSearch {
 
   /**
    * Finds a FIRST event
-   * @param code The event code
+   * @param id The event ID
    */
-  public async findEvent(code: string): Promise<Event> {
+  public async findEvent(id: string): Promise<Event> {
     // Check for a cached value
-    const cached = await this.redisCache.get<Event>('event', [code]);
+    const cached = await this.redisCache.get<Event>(id);
+    const eventData = this.idGenerator.decodeEvent(id);
     if (cached) return cached;
     // Otherwise, query the server
     return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
       query: {
         query_string: {
-          query: `event_code: ${code}`
+          query: `event_code: ${eventData.code}`
         }
       }
     }).then((results: any[]) => {
@@ -101,9 +104,10 @@ export class FIRSTSearch {
       }
       const eventRaw = results[0];
       const event: Event = {
-        id: eventRaw.id,
+        id,
         code: eventRaw.event_code,
         name: eventRaw.event_name,
+        description: eventRaw.event_description,
         address: eventRaw.event_address1 +
           (eventRaw.event_address2 ? ' ' + eventRaw.event_address2 : ''),
         venue: eventRaw.event_venue,
@@ -117,7 +121,7 @@ export class FIRSTSearch {
         program: eventRaw.event_type
       };
       // Cache the event
-      return this.redisCache.set('event', [code], event).then(() => {
+      return this.redisCache.set(event).then(() => {
         return event;
       });
     });

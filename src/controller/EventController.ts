@@ -10,7 +10,12 @@ export class EventController {
   ) { }
 
   @Query()
-  event({ code }) {
+  event({ id }) {
+    return this.eventRepository.findById(id);
+  }
+
+  @Query()
+  eventByCode({ code }) {
     return this.eventRepository.findByCode(code);
   }
 

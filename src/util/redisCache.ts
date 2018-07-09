@@ -1,5 +1,6 @@
 import * as IORedis from 'ioredis';
 import { Service } from 'typedi';
+import { Node } from '../entity/Node';
 
 @Service()
 export class RedisCache {
@@ -14,41 +15,25 @@ export class RedisCache {
   }
 
   /**
-   * Generates a Redis key
-   * @param type The type of the object
-   * @param idComponents Parts of the object's primary key
-   */
-  private makeKey(type: string, idComponents: string[]) {
-    return type + '-' + idComponents.join('-');
-  }
-
-  /**
    * Caches a single object in Redis
-   * @param type The type of the object
-   * @param idComponents Parts of the object's primary key
    * @param value The object itself
    * @param expire (optional, default is 3600) Expiration (in seconds)
    */
   public async set(
-    type: string,
-    idComponents: string[],
-    value: any,
+    value: Node,
     expire: number = 3600
   ) {
     const val = JSON.stringify(value);
-    const key = this.makeKey(type, idComponents);
-    await RedisCache.redis.set(key, val);
-    await RedisCache.redis.expire(key, expire);
+    await RedisCache.redis.set(value.id, val);
+    await RedisCache.redis.expire(value.id, expire);
   }
 
   /**
    * Gets a cached object
-   * @param type The type of the object
-   * @param idComponents Parts of the object's primary key
+   * @param id The object's ID
    */
-  public async get<T>(type: string, idComponents: string[]): Promise<T> {
-    const key = this.makeKey(type, idComponents);
-    return RedisCache.redis.get(key).then((value) => {
+  public async get<T>(id: string): Promise<T> {
+    return RedisCache.redis.get(id).then((value) => {
       if (!value) return null;
       return JSON.parse(value);
     });

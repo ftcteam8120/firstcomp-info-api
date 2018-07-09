@@ -10,7 +10,12 @@ export class TeamController {
   ) { }
 
   @Query()
-  team({ program, number }) {
+  team({ id }) {
+    return this.teamRepository.findById(id);
+  }
+
+  @Query()
+  teamByNumber({ program, number }) {
     return this.teamRepository.findByNumber(program, number);
   }
 

@@ -1,8 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany } from 'typeorm';
 import { Event } from './Event';
+import { Node } from './Node';
 
 @Entity()
-export class User {
+export class User implements Node {
 
   @PrimaryGeneratedColumn('uuid')
   id: string;

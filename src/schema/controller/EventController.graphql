@@ -1,3 +1,5 @@
 type Query {
-  event(code: String!): Event
+  event(id: ID, code: String): Event
+  eventByCode(code: String!): Event
+  # events(first: Int, after: String): EventConnection
 }

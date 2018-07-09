@@ -1,4 +1,5 @@
 import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { Node } from './Node';
 
 export enum Program {
   JFLL = 'JFLL',
@@ -8,14 +9,15 @@ export enum Program {
 }
 
 @Entity()
-export class Team {
+export class Team implements Node {
 
-  id?: number;
+  @PrimaryColumn()
+  id: string;
 
-  @PrimaryColumn({ enum: Program })
+  @Column()
   program: Program;
 
-  @PrimaryColumn({ type: 'int' })
+  @Column()
   number: string;
 
   @Column({ nullable: true })
