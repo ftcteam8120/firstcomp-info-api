@@ -2,6 +2,7 @@ import { Controller, Query } from 'vesper';
 import { EventRepository } from '../repository/EventRepository';
 import { TeamRepository } from '../repository/TeamRepository';
 import { IDGenerator } from '../util/IDGenerator';
+import { FIRSTSearch } from '../service/FIRSTSearch';
 import { EntityManager } from 'typeorm';
 import { User } from '../entity/User';
 
@@ -12,7 +13,8 @@ export class NodeController {
     private entityManager: EntityManager,
     private eventRepository: EventRepository,
     private teamRepository: TeamRepository,
-    private idGenerator: IDGenerator
+    private idGenerator: IDGenerator,
+    private firstSearch: FIRSTSearch
   ) { }
 
   @Query()
@@ -26,8 +28,13 @@ export class NodeController {
         return this.eventRepository.findById(id);
       }
       case 'User': {
-        // Otherwise, it is a user UUID
         return this.entityManager.findOne(User, id);
+      }
+      case 'Season': {
+        return this.firstSearch.findSeason(id);
+      }
+      case 'Country': {
+        return this.firstSearch.findCountry(id);
       }
       default: {
         throw new Error('Invalid ID format');

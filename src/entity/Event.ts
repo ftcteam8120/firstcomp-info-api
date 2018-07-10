@@ -35,6 +35,8 @@ export class Event implements Node {
   @PrimaryColumn()
   id: string;
 
+  internalId?: string;
+
   @Index()
   @Column()
   code: string;
@@ -46,8 +48,8 @@ export class Event implements Node {
   @Column({ nullable: true })
   address?: string;
 
-  @Column()
-  name: string;
+  @Column({ nullable: true })
+  name?: string;
 
   @Column({ nullable: true })
   description?: string;
@@ -76,8 +78,8 @@ export class Event implements Node {
   @Column({ nullable: true })
   website?: string;
 
-  @Column({ enum: Program })
-  program: Program;
+  @Column({ enum: Program, nullable: true })
+  program?: Program;
 
   @OneToMany(type => Match, match => match.event)
   matches?: Match[];

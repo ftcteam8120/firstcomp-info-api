@@ -20,6 +20,8 @@ import { UserController } from './controller/UserController';
 import { TeamController } from './controller/TeamController';
 import { EventController } from './controller/EventController';
 import { NodeController } from './controller/NodeController';
+import { SeasonController } from './controller/SeasonController';
+import { CountryController } from './controller/CountryController';
 
 // Import entities
 import { User } from './entity/User';
@@ -28,7 +30,9 @@ import { Match } from './entity/Match';
 import { Team } from './entity/Team';
 import { MatchTeam } from './entity/MatchTeam';
 
+// Import resolvers
 import { resolveType } from './entity/Node';
+import { TeamResolver } from './resolver/TeamResolver';
 
 // Start vesper
 bootstrap({
@@ -37,7 +41,9 @@ bootstrap({
     NodeController,
     UserController,
     TeamController,
-    EventController
+    EventController,
+    SeasonController,
+    CountryController
   ],
   entities: [
     User,
@@ -45,6 +51,9 @@ bootstrap({
     Match,
     Team,
     MatchTeam
+  ],
+  resolvers: [
+    TeamResolver
   ],
   customResolvers: {
     Node: {

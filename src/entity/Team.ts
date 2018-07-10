@@ -5,7 +5,10 @@ export enum Program {
   JFLL = 'JFLL',
   FLL = 'FLL',
   FTC = 'FTC',
-  FRC = 'FRC'
+  FRC = 'FRC',
+  FP = 'FP',
+  FIRST = 'FIRST',
+  FPTS = 'FPTS'
 }
 
 @Entity()
@@ -13,6 +16,8 @@ export class Team implements Node {
 
   @PrimaryColumn()
   id: string;
+
+  internalId?: string;
 
   @Column()
   program: Program;
@@ -39,7 +44,7 @@ export class Team implements Node {
   stateProv?: string;
 
   @Column({ nullable: true })
-  country?: string;
+  countryCode?: string;
 
   @Column({ nullable: true })
   rookieYear?: number;
@@ -52,5 +57,7 @@ export class Team implements Node {
 
   @Column({ nullable: true })
   website?: string;
+
+  seasonId?: string;
 
 }

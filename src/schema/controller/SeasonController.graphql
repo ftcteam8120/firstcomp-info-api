@@ -1,0 +1,5 @@
+type Query {
+  season(id: ID!): Season
+  seasons(first: Int, after: String, program: Program): SeasonConnection
+  seasonByYear(program: Program!, year: Int!): Season
+}

@@ -1,0 +1,17 @@
+type Season implements Node {
+  id: ID!
+  name: String
+  program: Program
+  startYear: Int
+}
+
+type SeasonEdge {
+  cursor: String!
+  node: Season
+}
+
+type SeasonConnection {
+  totalCount: Int!
+  edges: [SeasonEdge]
+  pageInfo: PageInfo!
+}

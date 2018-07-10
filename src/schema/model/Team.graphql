@@ -3,6 +3,9 @@ enum Program {
   FLL
   FTC
   FRC
+  FP
+  FIRST
+  FPTS
 }
 
 type Team implements Node {
@@ -15,11 +18,13 @@ type Team implements Node {
   schoolName: String
   city: String
   stateProv: String
-  country: String
+  countryCode: String
+  country: Country
   rookieYear: Int
   robotName: String
   districtCode: String
   website: String
+  season: Season
 }
 
 type TeamEdge {
@@ -28,6 +33,7 @@ type TeamEdge {
 }
 
 type TeamConnection {
+  totalCount: Int!
   edges: [TeamEdge]
   pageInfo: PageInfo!
 }

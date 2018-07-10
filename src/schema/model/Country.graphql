@@ -1,0 +1,16 @@
+type Country implements Node {
+  id: ID!
+  name: String
+  code: String
+}
+
+type CountryEdge {
+  cursor: String!
+  node: Country
+}
+
+type CountryConnection {
+  totalCount: Int!
+  edges: [CountryEdge]
+  pageInfo: PageInfo!
+}

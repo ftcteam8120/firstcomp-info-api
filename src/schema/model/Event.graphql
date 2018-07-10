@@ -46,6 +46,7 @@ type EventEdge {
 }
 
 type EventConnection {
+  totalCount: Int!
   edges: [EventEdge]
   pageInfo: PageInfo!
 }
