@@ -19,6 +19,12 @@ export interface Edge<T> {
   cursor: string;
 }
 
+export interface Connection<T> {
+  pageInfo: PageInfo;
+  edges: Edge<T>[];
+  totalCount: number;
+}
+
 export function resolveType(data: Node): string {
   return new IDGenerator().getNodeType(data.id);
 }
