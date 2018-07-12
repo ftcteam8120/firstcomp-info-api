@@ -1,11 +1,11 @@
 import { Service } from 'typedi';
 import { RedisCache } from '../util/RedisCache';
-import { Event, EventType } from '../entity/Event';
-import { Team, Program } from '../entity/Team';
+import { Event, EventType, EventFilter, EventOrder } from '../entity/Event';
+import { Team, Program, TeamFilter, TeamOrder } from '../entity/Team';
 import { ElasticSearch, ElasticResult } from '../util/ElasticSearch';
 import { IDGenerator } from '../util/IDGenerator';
-import { Season } from '../entity/Season';
-import { Country } from '../entity/Country';
+import { Season, SeasonFilter, SeasonOrder } from '../entity/Season';
+import { Country, CountryFilter, CountryOrder } from '../entity/Country';
 
 export interface FindResult<T> {
   totalCount: number;
@@ -18,15 +18,6 @@ export interface SeasonQueryParams {
   program: Program;
 }
 
-export interface TeamsQueryParams {
-  program: Program;
-  season: string;
-}
-
-export interface EventQueryParams {
-  program: Program;
-}
-
 @Service()
 export class FIRSTSearch {
 
@@ -36,23 +27,63 @@ export class FIRSTSearch {
     private idGenerator: IDGenerator
   ) { }
 
+  private convertAll<T>(
+    result: ElasticResult,
+    first: number,
+    after: string,
+    converter: (nodeRaw: any) => T
+  ): FindResult<T> {
+    const nodes: T[] = [];
+    let nodeRaw: any;
+    if (result.totalCount > 0) {
+      for (let i = 0; i < result.hits.length; i += 1) {
+        nodeRaw = result.hits[i];
+        nodes.push(converter(nodeRaw));
+      }
+    }
+    // Remove the last result if it is over the size limit
+    if (result.hits.length === (first + 1)) {
+      nodes.pop();
+    }
+    return {
+      totalCount: result.totalCount,
+      hasNextPage: result.hits[(first + 1) - 1] ? true : false,
+      hasPreviousPage: after ? true : false,
+      data: nodes
+    };
+  }
+
   private convertTeam(id: string, data: any): Team {
     return {
       id,
       internalId: data.id,
       number: data.team_number_yearly,
       program: data.team_type,
-      nameFull: data.team_nickname,
-      nameShort: data.team_nickname,
+      name: data.team_nickname,
       schoolName: data.team_name_calc,
       city: data.team_city,
       stateProv: data.team_stateprov,
-      countryCode: data.countryCode,
+      countryCode: data.team_country,
       rookieYear: data.team_rookieyear,
       website: data.team_web_url,
+      profileYear: data.profile_year,
       seasonId: data.fk_program_seasons ? this.idGenerator.season(data.fk_program_seasons) : null
     };
   }
+
+  private teamOrderDict = {
+    id: '_id',
+    program: 'team_type',
+    number: 'team_number_yearly',
+    name: 'team_nickname',
+    schoolName: 'team_name_calc',
+    city: 'team_city',
+    stateProv: 'team_stateprov',
+    countryCode: 'team_country',
+    rookieYear: 'team_rookieyear',
+    website: 'team_web_url',
+    profileYear: 'profile_year'
+  };
 
   private convertEvent(id: string, data: any): Event {
     return {
@@ -65,7 +96,7 @@ export class FIRSTSearch {
         (data.event_address2 ? ' ' + data.event_address2 : ''),
       venue: data.event_venue,
       city: data.event_city,
-      country: data.event_country,
+      countryCode: data.event_country,
       stateProv: data.event_stateprov,
       dateStart: data.date_start,
       dateEnd: data.date_end,
@@ -74,6 +105,22 @@ export class FIRSTSearch {
       program: data.event_type
     };
   }
+
+  private eventOrderDict = {
+    id: '_id',
+    code: 'event_code',
+    name: 'event_name',
+    description: 'event_description',
+    address: 'event_address1',
+    venue: 'event_venue',
+    city: 'event_city',
+    countryCode: 'event_country',
+    stateProv: 'event_stateprov',
+    dateStart: 'date_start',
+    dateEnd: 'date_end',
+    website: 'event_web_url',
+    program: 'event_type'
+  };
 
   private convertSeason(id: string, data: any): Season {
     return {
@@ -84,6 +131,13 @@ export class FIRSTSearch {
     };
   }
 
+  private seasonOrderDict = {
+    id: '_id',
+    program: 'program_code',
+    name: 'season_name',
+    startYear: 'season_year_start'
+  };
+
   private convertCountry(id: string, data: any): Country {
     return {
       id,
@@ -91,6 +145,12 @@ export class FIRSTSearch {
       code: data.iso_country_code
     };
   }
+
+  private countryOrderDict = {
+    id: '_id',
+    name: 'iso_country_name',
+    code: 'iso_country_code'
+  };
   
   /**
    * Finds a FIRST team
@@ -127,7 +187,7 @@ export class FIRSTSearch {
   }
 
   /**
-   * Converts a readable event subtype into an EventTypeEnum value
+   * Converts a readable event subtype into an EventType enum value
    * @param input The raw event subtype
    */
   public convertEventType(input: string): EventType {
@@ -179,88 +239,63 @@ export class FIRSTSearch {
 
   /**
    * Find all teams
-   * @param first How many teams to find (defaults to 10)
-   * @param after A team cursor
+   * @param first How many teams to fetch
+   * @param after A cursor to find teams after
+   * @param filter An object containing filters
+   * @param orderBy An array of TeamOrder enums
    */
-  public findTeams(first: number, after?: string, query?: TeamsQueryParams):
-    Promise<FindResult<Team>> {
-    const seasonId = query.season ?
-      this.idGenerator.decodeSeason(query.season).internalId :
+  public findTeams(
+    first: number,
+    after?: string,
+    filter: TeamFilter = {},
+    orderBy: TeamOrder[] = []
+  ): Promise<FindResult<Team>> {
+    const seasonId = filter.season ?
+      this.idGenerator.decodeSeason(filter.season).internalId :
       undefined;
     return this.elasticSearch.query('https://es01.usfirst.org/teams/_search', {
       size: first + 1,
       from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
-      sort: {
-        _id: 'desc'
-      },
+      sort: this.elasticSearch.buildSort(this.teamOrderDict, orderBy ? orderBy : []),
       query: this.elasticSearch.buildQuery({
-        team_type: query.program,
-        fk_program_seasons: seasonId
+        team_type: filter.program,
+        fk_program_seasons: seasonId,
+        profile_year: filter.profileYear
       })
     }).then((result: ElasticResult) => {
-      const teams: Team[] = [];
-      let teamRaw: any;
-      let team: Team;
-      if (result.totalCount > 0) {
-        for (let i = 0; i < result.hits.length; i += 1) {
-          teamRaw = result.hits[i];
-          team = this.convertTeam(
-            this.idGenerator.team(teamRaw.team_type, teamRaw.team_number_yearly),
-            teamRaw
-          );
-          teams.push(team);
-        }
-      }
-      // Remove the last result if it is over the size limit
-      if (result.hits.length === (first + 1)) {
-        teams.pop();
-      }
-      return {
-        totalCount: result.totalCount,
-        hasNextPage: result.hits[(first + 1) - 1] ? true : false,
-        hasPreviousPage: after ? true : false,
-        data: teams
-      };
+      return this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertTeam(
+          this.idGenerator.team(nodeRaw.team_type, nodeRaw.team_number_yearly),
+          nodeRaw
+        );
+      });
     });
   }
 
   /**
    * Find all events
-   * @param first How many events to find (defaults to 10)
-   * @param after An event cursor
+   * @param first How many events to fetch
+   * @param after A cursor to find events after
+   * @param filter An object containing filters
+   * @param orderBy An array of EventOrder enums
    */
-  public findEvents(first: number, after?: string, query?: EventQueryParams):
-    Promise<FindResult<Event>> {
+  public findEvents(
+    first: number,
+    after?: string,
+    filter: EventFilter = {},
+    orderBy: EventOrder[] = []
+  ): Promise<FindResult<Event>> {
     return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
       size: first + 1,
       from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
-      sort: {
-        _id: 'desc'
-      },
-      query: this.elasticSearch.buildQuery({
-        event_type: query.program
-      })
+      sort: this.elasticSearch.buildSort(this.eventOrderDict, orderBy ? orderBy : []),
+      query: this.elasticSearch.buildQuery(filter ? {
+        event_type: filter.program
+      } : {})
     }).then((result: ElasticResult) => {
-      const events: Event[] = [];
-      let eventRaw: any;
-      let event: Event;
-      if (result.totalCount > 0) {
-        for (let i = 0; i < result.hits.length; i += 1) {
-          eventRaw = result.hits[i];
-          event = this.convertEvent(this.idGenerator.event(eventRaw.event_code), eventRaw);
-          events.push(event);
-        }
-      }
-      // Remove the last result if it is over the size limit
-      if (result.hits.length === (first + 1)) {
-        events.pop();
-      }
-      return {
-        totalCount: result.totalCount,
-        hasNextPage: result.hits[(first + 1) - 1] ? true : false,
-        hasPreviousPage: after ? true : false,
-        data: events
-      };
+      return this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertEvent(this.idGenerator.event(nodeRaw.event_code), nodeRaw);
+      });
     });
   }
 
@@ -303,46 +338,27 @@ export class FIRSTSearch {
     });
   }
 
-  public findSeasons(first: number, after?: string, query?: SeasonQueryParams):
-    Promise<FindResult<Season>> {
+  public findSeasons(
+    first: number,
+    after?: string,
+    filter: SeasonFilter = {},
+    orderBy: SeasonOrder[] = []
+  ): Promise<FindResult<Season>> {
     return this.elasticSearch.query('https://es01.usfirst.org/seasons/_search', {
       size: first + 1 | 101,
       from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
       query: this.elasticSearch.buildQuery({
-        program_code: query.program
+        program_code: filter.program,
+        season_year_start: filter.startYear
       }),
-      sort: {
-        season_year_start: {
-          order: 'desc'
-        },
-        program_code: {
-          order: 'desc'
-        }
-      }
+      sort: this.elasticSearch.buildSort(this.seasonOrderDict, orderBy)
     }).then((result: ElasticResult) => {
-      const seasons: Season[] = [];
-      let seasonRaw: any;
-      let season: Season;
-      if (result.totalCount > 0) {
-        for (let i = 0; i < result.hits.length; i += 1) {
-          seasonRaw = result.hits[i];
-          season = this.convertSeason(
-            this.idGenerator.season(seasonRaw.id),
-            seasonRaw
-          );
-          seasons.push(season);
-        }
-      }
-      // Remove the last result if it is over the size limit
-      if (result.hits.length === (first + 1)) {
-        seasons.pop();
-      }
-      return {
-        totalCount: result.totalCount,
-        hasNextPage: result.hits[(first + 1) - 1] ? true : false,
-        hasPreviousPage: after ? true : false,
-        data: seasons
-      };
+      return this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertSeason(
+          this.idGenerator.season(nodeRaw.id),
+          nodeRaw
+        );
+      });
     });
   }
 
@@ -354,7 +370,7 @@ export class FIRSTSearch {
     return this.elasticSearch.query('https://es01.usfirst.org/countries/_search', {
       query: {
         query_string: {
-          query: `iso_country_code: ${countryData.code}`
+          query: `first_country_code: ${countryData.code}`
         }
       }
     }).then((result: ElasticResult) => {
@@ -370,35 +386,26 @@ export class FIRSTSearch {
     });
   }
 
-  public findCountries(first: number, after?: string):
-    Promise<FindResult<Country>> {
+  public findCountries(
+    first: number,
+    after?: string,
+    filter: CountryFilter = {},
+    orderBy: CountryOrder[] = []
+  ): Promise<FindResult<Country>> {
     return this.elasticSearch.query('https://es01.usfirst.org/countries/_search', {
       size: first + 1,
-      from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0
+      from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
+      query: this.elasticSearch.buildQuery({
+        iso_country_code: filter.code
+      }),
+      sort: this.elasticSearch.buildSort(this.countryOrderDict, orderBy)
     }).then((result: ElasticResult) => {
-      const countries: Country[] = [];
-      let countryRaw: any;
-      let country: Country;
-      if (result.totalCount > 0) {
-        for (let i = 0; i < result.hits.length; i += 1) {
-          countryRaw = result.hits[i];
-          country = this.convertCountry(
-            this.idGenerator.country(countryRaw.iso_country_code),
-            countryRaw
-          );
-          countries.push(country);
-        }
-      }
-      // Remove the last result if it is over the size limit
-      if (result.hits.length === (first + 1)) {
-        countries.pop();
-      }
-      return {
-        totalCount: result.totalCount,
-        hasNextPage: result.hits[(first + 1) - 1] ? true : false,
-        hasPreviousPage: after ? true : false,
-        data: countries
-      };
+      return this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertCountry(
+          this.idGenerator.country(nodeRaw.iso_country_code),
+          nodeRaw
+        );
+      });
     });
   }
 

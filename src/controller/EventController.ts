@@ -1,7 +1,7 @@
 import { Controller, Query } from 'vesper';
-import { EntityManager } from 'typeorm';
 import { EventRepository } from '../repository/EventRepository';
 import { Paginator } from '../util/Paginator';
+import { EventOrder } from '../entity/Event';
 
 @Controller()
 export class EventController {
@@ -22,9 +22,9 @@ export class EventController {
   }
 
   @Query()
-  async events({ first, after, program }) {
+  async events({ first, after, filter, orderBy }) {
     return this.paginator.paginate(
-      await this.eventRepository.find(first || 10, after, { program }),
+      await this.eventRepository.find(first || 10, after, filter, orderBy),
       after
     );
   }

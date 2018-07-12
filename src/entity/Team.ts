@@ -29,10 +29,7 @@ export class Team implements Node {
   homeCmp?: string;
 
   @Column({ nullable: true })
-  nameFull?: string;
-
-  @Column({ nullable: true })
-  nameShort?: string;
+  name?: string;
 
   @Column({ nullable: true })
   schoolName?: string;
@@ -58,6 +55,42 @@ export class Team implements Node {
   @Column({ nullable: true })
   website?: string;
 
+  @Column({ nullable: true })
+  profileYear?: number;
+
   seasonId?: string;
 
+}
+
+export interface TeamFilter {
+  program?: Program;
+  season?: string;
+  profileYear?: number;
+}
+
+export enum TeamOrder {
+  id_ASC = 'id_ASC',
+  id_DESC = 'id_DESC',
+  program_ASC = 'program_ASC',
+  program_DESC = 'program_DESC',
+  number_ASC = 'number_ASC',
+  number_DESC = 'number_DESC',
+  nameFull_ASC  = 'nameFull_ASC',
+  nameFull_DESC  = 'nameFull_DESC',
+  nameShort_ASC = 'nameShort_ASC',
+  nameShort_DESC = 'nameShort_DESC',
+  schoolName_ASC = 'nameShort_DESC',
+  schoolName_DESC = 'nameShort_DESC',
+  city_ASC = 'city_ASC',
+  city_DESC = 'city_DESC',
+  stateProv_ASC = 'stateProv_ASC',
+  stateProv_DESC = 'stateProv_DESC',
+  countryCode_ASC = 'countryCode_ASC',
+  countryCode_DESC = 'countryCode_DESC',
+  rookieYear_ASC = 'rookieYear_ASC',
+  rookieYear_DESC = 'rookieYear_DESC',
+  website_ASC = 'website_ASC',
+  website_DESC = 'website_DESC',
+  profileYear_ASC = 'profileYear_ASC',
+  profileYear_DESC = 'profileYear_DESC'
 }

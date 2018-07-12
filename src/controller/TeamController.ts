@@ -1,6 +1,7 @@
 import { Controller, Query } from 'vesper';
 import { TeamRepository } from '../repository/TeamRepository';
 import { Paginator } from '../util/Paginator';
+import { TeamOrder } from '../entity/Team';
 
 @Controller()
 export class TeamController {
@@ -21,16 +22,9 @@ export class TeamController {
   }
 
   @Query()
-  async teams({ first, after, program, season }) {
+  async teams({ first, after, filter, orderBy }) {
     return this.paginator.paginate(
-      await this.teamRepository.find(
-        first || 10,
-        after,
-        {
-          program,
-          season
-        }
-      ),
+      await this.teamRepository.find(first || 10, after, filter, orderBy),
       after
     );
   }

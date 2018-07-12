@@ -1,7 +1,7 @@
 import { EntityManager } from 'typeorm';
 import { Service } from 'typedi';
-import { Team, Program } from '../entity/Team';
-import { FIRSTSearch, FindResult, TeamsQueryParams } from '../service/FIRSTSearch';
+import { Team, Program, TeamFilter, TeamOrder } from '../entity/Team';
+import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
 import * as _ from 'lodash';
 import { IDGenerator } from '../util/IDGenerator';
 
@@ -45,12 +45,14 @@ export class TeamRepository {
 
   /**
    * Find all teams
-   * @param first How many teams to find (defaults to 10)
-   * @param after A team cursor
+   * @param first How many teams to find
+   * @param after A curstor to find teams after
+   * @param filter An object containing filters
+   * @param orderBy An array of TeamOrder enums
    */
-  public async find(first: number, after?: string, query?: TeamsQueryParams):
+  public async find(first: number, after?: string, filter?: TeamFilter, orderBy?: TeamOrder[]):
     Promise<FindResult<Team>> {
-    return this.firstSearch.findTeams(first, after, query);
+    return this.firstSearch.findTeams(first, after, filter, orderBy);
   }
 
 }

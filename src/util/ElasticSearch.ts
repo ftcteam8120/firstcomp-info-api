@@ -50,11 +50,11 @@ export class ElasticSearch {
           // Prevent undefined and null values
           if (values[Object.keys(values)[i]]) {
             string += Object.keys(values)[i] + ': ' + values[Object.keys(values)[i]];
-            // Join values with AND statement
-            if (i !== Object.keys(values).length - 1 && values[Object.keys(values)[i + 1]]) {
-              string += ' AND ';
-            }
             count += 1;
+          }
+          // Join values with AND statement
+          if (i !== Object.keys(values).length - 1 && values[Object.keys(values)[i + 1]]) {
+            string += ' AND ';
           }
         }
         if (count !== 0) {
@@ -67,6 +67,21 @@ export class ElasticSearch {
       }
     }
     return undefined;
+  }
+
+  public buildSort(dict: any, values: string[]): any {
+    let split: string[];
+    const sort = {};
+    for (let i = 0; i < values.length; i += 1) {
+      // Split the order into its parts
+      split = values[i].split('_');
+      // Use the dictionary to convert the name into the raw database value name
+      // Set the key in the sort object
+      sort[dict[split[0]]] = {
+        order: split[1].toLowerCase()
+      };
+    }
+    return sort;
   }
 
 }

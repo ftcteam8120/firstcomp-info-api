@@ -1,6 +1,7 @@
 import { Controller, Query } from 'vesper';
 import { FIRSTSearch } from '../service/FIRSTSearch';
 import { Paginator } from '../util/Paginator';
+import { SeasonOrder } from '../entity/Season';
 
 @Controller()
 export class SeasonController {
@@ -11,9 +12,9 @@ export class SeasonController {
   ) { }
 
   @Query()
-  async seasons({ first, after, program }) {
+  async seasons({ first, after, filter, orderBy }) {
     return this.paginator.paginate(
-      await this.firstSearch.findSeasons(first || 100, after, { program }),
+      await this.firstSearch.findSeasons(first || 100, after, filter, orderBy),
       after
     );
   }

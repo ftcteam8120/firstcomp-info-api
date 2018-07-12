@@ -14,3 +14,16 @@ type CountryConnection {
   edges: [CountryEdge]
   pageInfo: PageInfo!
 }
+
+input CountryFilter {
+  code: String
+}
+
+enum CountryOrder {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  code_ASC
+  code_DESC
+}

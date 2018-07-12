@@ -1,5 +1,5 @@
 type Query {
   event(id: ID!): Event
   eventByCode(code: String!): Event
-  events(first: Int, after: String, program: Program): EventConnection
+  events(first: Int, after: String, filter: EventFilter, orderBy: [EventOrder]): EventConnection
 }

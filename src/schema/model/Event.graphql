@@ -31,7 +31,8 @@ type Event implements Node {
   description: String
   venue: String
   city: String
-  country: String
+  countryCode: String
+  country: Country
   stateProv: String
   dateStart: String
   dateEnd: String
@@ -49,4 +50,39 @@ type EventConnection {
   totalCount: Int!
   edges: [EventEdge]
   pageInfo: PageInfo!
+}
+
+input EventFilter {
+  program: Program
+}
+
+enum EventOrder {
+  id_ASC
+  id_DESC
+  code_ASC
+  code_DESC
+  address_ASC
+  address_DESC
+  name_ASC
+  name_DESC
+  description_ASC
+  description_DESC
+  venue_ASC
+  venue_DESC
+  city_ASC
+  city_DESC
+  countryCode_ASC
+  countryCode_DESC
+  stateProv_ASC
+  stateProv_DESC
+  dateStart_ASC
+  dateStart_DESC
+  dateEnd_ASC
+  dateEnd_DESC
+  # type_ASC
+  # type_DESC
+  website_ASC
+  website_DESC
+  program_ASC
+  program_DESC
 }

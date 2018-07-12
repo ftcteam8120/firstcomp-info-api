@@ -13,8 +13,7 @@ type Team implements Node {
   program: Program!
   number: Int!
   homeCmp: String
-  nameFull: String
-  nameShort: String
+  name: String
   schoolName: String
   city: String
   stateProv: String
@@ -25,6 +24,7 @@ type Team implements Node {
   districtCode: String
   website: String
   season: Season
+  profileYear: Int
 }
 
 type TeamEdge {
@@ -36,4 +36,35 @@ type TeamConnection {
   totalCount: Int!
   edges: [TeamEdge]
   pageInfo: PageInfo!
+}
+
+input TeamFilter {
+  program: Program
+  season: ID
+  profileYear: Int
+}
+
+enum TeamOrder {
+  id_ASC
+  id_DESC
+  program_ASC
+  program_DESC
+  number_ASC
+  number_DESC
+  name_ASC
+  name_DESC
+  schoolName_ASC
+  schoolName_DESC
+  city_ASC
+  city_DESC
+  stateProv_ASC
+  stateProv_DESC
+  countryCode_ASC
+  countryCode_DESC
+  rookieYear_ASC
+  rookieYear_DESC
+  website_ASC
+  website_DESC
+  profileYear_ASC
+  profileYear_DESC
 }

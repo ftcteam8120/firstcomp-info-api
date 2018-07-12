@@ -1,5 +1,5 @@
 type Query {
   season(id: ID!): Season
-  seasons(first: Int, after: String, program: Program): SeasonConnection
+  seasons(first: Int, after: String, filter: SeasonFilter, orderBy: [SeasonOrder]): SeasonConnection
   seasonByYear(program: Program!, year: Int!): Season
 }

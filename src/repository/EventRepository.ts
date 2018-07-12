@@ -1,7 +1,7 @@
 import { EntityManager } from 'typeorm';
 import { Service } from 'typedi';
-import { Event } from '../entity/Event';
-import { FIRSTSearch, FindResult, EventQueryParams } from '../service/FIRSTSearch';
+import { Event, EventFilter, EventOrder } from '../entity/Event';
+import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
 import * as _ from 'lodash';
 import { IDGenerator } from '../util/IDGenerator';
 
@@ -41,13 +41,15 @@ export class EventRepository {
 
   /**
    * Find all events
-   * @param first How many events to find (defaults to 10)
-   * @param after An event cursor
+   * @param first How many events to find
+   * @param after A curstor to find events after
+   * @param filter An object containing filters
+   * @param orderBy An array of EventOrder enums
    */
-  public async find(first: number, after?: string, query?: EventQueryParams):
+  public async find(first: number, after?: string, filter?: EventFilter, orderBy?: EventOrder[]):
     Promise<FindResult<Event>> {
     // Get the FIRST data
-    const firstData = await this.firstSearch.findEvents(first, after, query);
+    const firstData = await this.firstSearch.findEvents(first, after, filter, orderBy);
     const ids: string[] = [];
     const events: Event[] = [];
     // Fill the array of IDs to search for

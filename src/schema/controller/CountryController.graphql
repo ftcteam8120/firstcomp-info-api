@@ -1,5 +1,5 @@
 type Query {
   country(id: ID!): Country
-  countries(first: Int, after: String): CountryConnection
   countryByCode(code: String!): Country
+  countries(first: Int, after: String, filter: CountryFilter, orderBy: [CountryOrder]): CountryConnection
 }

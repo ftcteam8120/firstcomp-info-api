@@ -61,7 +61,7 @@ export class Event implements Node {
   city?: string;
 
   @Column({ nullable: true })
-  country?: string;
+  countryCode?: string;
 
   @Column({ nullable: true })
   stateProv?: string;
@@ -84,4 +84,39 @@ export class Event implements Node {
   @OneToMany(type => Match, match => match.event)
   matches?: Match[];
 
+}
+
+export interface EventFilter {
+  program?: Program;
+}
+
+export enum EventOrder {
+  id_ASC = 'id_ASC',
+  id_DESC = 'id_DESC',
+  code_ASC = 'code_ASC',
+  code_DESC = 'code_DESC',
+  address_ASC = 'address_ASC',
+  address_DESC = 'address_DESC',
+  name_ASC = 'name_ASC',
+  name_DESC = 'name_DESC',
+  description_ASC = 'description_ASC',
+  description_DESC = 'description_DESC',
+  venue_ASC = 'venue_ASC',
+  venue_DESC = 'venue_DESC',
+  city_ASC = 'city_ASC',
+  city_DESC = 'city_DESC',
+  country_ASC = 'country_ASC',
+  country_DESC = 'country_DESC',
+  stateProv_ASC = 'stateProv_ASC',
+  stateProv_DESC = 'stateProv_DESC',
+  dateStart_ASC = 'dateStart_ASC',
+  dateStart_DESC = 'dateStart_DESC',
+  dateEnd_ASC = 'dateEnd_ASC',
+  dateEnd_DESC = 'dateEnd_DESC',
+  type_ASC = 'type_ASC',
+  type_DESC = 'type_DESC',
+  website_ASC = 'website_ASC',
+  website_DESC = 'website_DESC',
+  program_ASC = 'program_ASC',
+  program_DESC = 'program_DESC',
 }

@@ -1,5 +1,5 @@
 type Query {
   team(id: ID!): Team
   teamByNumber(program: Program!, number: Int!): Team
-  teams(first: Int, after: String, program: Program, season: ID): TeamConnection
+  teams(first: Int, after: String, filter: TeamFilter, orderBy: [TeamOrder]): TeamConnection
 }

@@ -15,3 +15,19 @@ type SeasonConnection {
   edges: [SeasonEdge]
   pageInfo: PageInfo!
 }
+
+input SeasonFilter {
+  program: Program
+  startYear: Int
+}
+
+enum SeasonOrder {
+  id_ASC
+  id_DESC
+  program_ASC
+  program_DESC
+  name_ASC
+  name_DESC
+  startYear_ASC
+  startYear_DESC
+}
