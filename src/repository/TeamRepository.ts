@@ -2,8 +2,8 @@ import { EntityManager } from 'typeorm';
 import { Service } from 'typedi';
 import { Team, Program, TeamFilter, TeamOrder } from '../entity/Team';
 import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
-import * as _ from 'lodash';
 import { IDGenerator } from '../util/IDGenerator';
+import { DataMerge } from '../util/DataMerge';
 
 @Service()
 export class TeamRepository {
@@ -11,7 +11,8 @@ export class TeamRepository {
   constructor(
     private entityManager: EntityManager,
     private firstSearch: FIRSTSearch,
-    private idGenerator: IDGenerator
+    private idGenerator: IDGenerator,
+    private dataMerge: DataMerge
   ) { }
 
   /**
@@ -19,18 +20,13 @@ export class TeamRepository {
    * @param id The team ID
    */
   public async findById(id: string): Promise<Team> {
-    const firstData = await this.firstSearch.findTeam(id);
     const teamData = this.idGenerator.decodeTeam(id);
-    const localData = await this.entityManager.findOne(Team, {
-      program: teamData.program,
-      number: teamData.number.toString()
-    });
-    if (firstData === null && localData === undefined) return null;
-    return _.mergeWith(
-      {},
-      firstData,
-      localData,
-      (a, b) => b === null ? a : undefined
+    return this.dataMerge.mergeOne<Team>(
+      await this.firstSearch.findTeam(id),
+      await this.entityManager.findOne(Team, {
+        program: teamData.program,
+        number: teamData.number.toString()
+      })
     );
   }
   
@@ -52,7 +48,10 @@ export class TeamRepository {
    */
   public async find(first: number, after?: string, filter?: TeamFilter, orderBy?: TeamOrder[]):
     Promise<FindResult<Team>> {
-    return this.firstSearch.findTeams(first, after, filter, orderBy);
+    return this.dataMerge.mergeMany<Team>(
+      Team,
+      await this.firstSearch.findTeams(first, after, filter, orderBy)
+    );
   }
 
 }
