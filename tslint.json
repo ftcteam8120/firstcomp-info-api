@@ -3,6 +3,7 @@
   "rules": {
     "no-trailing-whitespace": false,
     "trailing-comma": false,
-    "import-name": false
+    "import-name": false,
+    "align": false
   }
 }

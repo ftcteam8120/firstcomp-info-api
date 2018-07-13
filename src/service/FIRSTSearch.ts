@@ -263,11 +263,19 @@ export class FIRSTSearch {
         profile_year: filter.profileYear
       })
     }).then((result: ElasticResult) => {
-      return this.convertAll(result, first, after, (nodeRaw) => {
+      const converted = this.convertAll(result, first, after, (nodeRaw) => {
         return this.convertTeam(
           this.idGenerator.team(nodeRaw.team_type, nodeRaw.team_number_yearly),
           nodeRaw
         );
+      });
+      // Cache all teams
+      const cachePromises = [];
+      for (const node of converted.data) {
+        cachePromises.push(this.redisCache.set(node));
+      }
+      return Promise.all(cachePromises).then(() => {
+        return converted;
       });
     });
   }
@@ -293,8 +301,16 @@ export class FIRSTSearch {
         event_type: filter.program
       } : {})
     }).then((result: ElasticResult) => {
-      return this.convertAll(result, first, after, (nodeRaw) => {
+      const converted = this.convertAll(result, first, after, (nodeRaw) => {
         return this.convertEvent(this.idGenerator.event(nodeRaw.event_code), nodeRaw);
+      });
+      // Cache all events
+      const cachePromises = [];
+      for (const node of converted.data) {
+        cachePromises.push(this.redisCache.set(node));
+      }
+      return Promise.all(cachePromises).then(() => {
+        return converted;
       });
     });
   }
@@ -352,12 +368,20 @@ export class FIRSTSearch {
         season_year_start: filter.startYear
       }),
       sort: this.elasticSearch.buildSort(this.seasonOrderDict, orderBy)
-    }).then((result: ElasticResult) => {
-      return this.convertAll(result, first, after, (nodeRaw) => {
+    }, true).then((result: ElasticResult) => {
+      const converted = this.convertAll(result, first, after, (nodeRaw) => {
         return this.convertSeason(
           this.idGenerator.season(nodeRaw.id),
           nodeRaw
         );
+      });
+      // Cache all seasons
+      const cachePromises = [];
+      for (const node of converted.data) {
+        cachePromises.push(this.redisCache.set(node));
+      }
+      return Promise.all(cachePromises).then(() => {
+        return converted;
       });
     });
   }
@@ -399,12 +423,20 @@ export class FIRSTSearch {
         iso_country_code: filter.code
       }),
       sort: this.elasticSearch.buildSort(this.countryOrderDict, orderBy)
-    }).then((result: ElasticResult) => {
-      return this.convertAll(result, first, after, (nodeRaw) => {
+    }, true).then((result: ElasticResult) => {
+      const converted = this.convertAll(result, first, after, (nodeRaw) => {
         return this.convertCountry(
           this.idGenerator.country(nodeRaw.iso_country_code),
           nodeRaw
         );
+      });
+      // Cache all countries
+      const cachePromises = [];
+      for (const node of converted.data) {
+        cachePromises.push(this.redisCache.set(node));
+      }
+      return Promise.all(cachePromises).then(() => {
+        return converted;
       });
     });
   }

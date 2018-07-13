@@ -1,5 +1,8 @@
 import fetch from 'node-fetch';
 import { Service } from 'typedi';
+import { RedisCache } from './RedisCache';
+import { IDGenerator } from './IDGenerator';
+import { Node } from '../entity/Node';
 
 // TODO: Replace this hack with a real solution
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
@@ -9,8 +12,17 @@ export interface ElasticResult {
   totalCount: number;
 }
 
+export interface ElasticResultCache extends Node {
+  result: ElasticResult;
+}
+
 @Service()
 export class ElasticSearch {
+
+  constructor(
+    private redisCache: RedisCache,
+    private idGenerator: IDGenerator
+  ) {}
 
   /**
    * Execute an ElasticSearch query
@@ -18,11 +30,17 @@ export class ElasticSearch {
    * @param query A JSON query
    * @param size (optional) The number or results to return
    */
-  public async query(url: string, query: any, size?: number):
+  public async query(url: string, query: any, cache: boolean = false):
     Promise<ElasticResult> {
+    const jsonQuery = JSON.stringify(query);
+    if (cache) {
+      // Check if there is a cached version of the query
+      const cached: ElasticResultCache =
+      await this.redisCache.get<ElasticResultCache>(this.idGenerator.atob(jsonQuery));
+      if (cached) return cached.result;
+    }
     // Return a fetch promise with the result of the query
-    return fetch(url + '?source=' +
-      encodeURIComponent(JSON.stringify(query)) + (size ? '&size=' + size : ''))
+    return fetch(url + '?source=' + encodeURIComponent(jsonQuery))
       // Extract the JSON data
       .then(res => res.json())
       // Extract the hits
@@ -34,10 +52,21 @@ export class ElasticSearch {
         rawHits.forEach((hit) => {
           hits.push(hit._source);
         });
-        return {
+        const result = {
           hits,
           totalCount: json.hits.total
         };
+        if (cache) {
+          // Cache the query and its result
+          const cacheData: ElasticResultCache = {
+            result,
+            id: this.idGenerator.atob(jsonQuery)
+          };
+          return this.redisCache.set(cacheData).then(() => {
+            return result;
+          });
+        }
+        return result;
       });
   }
 
