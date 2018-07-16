@@ -32,13 +32,11 @@ export enum EventType {
 @Entity()
 export class Event implements Node {
 
-  @PrimaryColumn()
   id: string;
 
   internalId?: string;
 
-  @Index()
-  @Column()
+  @PrimaryColumn({ type: 'varchar' })
   code: string;
 
   @ManyToMany(type => User)

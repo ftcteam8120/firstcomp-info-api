@@ -47,7 +47,8 @@ export class EventRepository {
     Promise<FindResult<Event>> {
     return this.dataMerge.mergeMany<Event>(
       Event,
-      await this.firstSearch.findEvents(first, after, filter, orderBy)
+      await this.firstSearch.findEvents(first, after, filter, orderBy),
+      ['code']
     );
   }
 

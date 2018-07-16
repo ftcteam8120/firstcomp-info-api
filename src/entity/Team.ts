@@ -14,15 +14,14 @@ export enum Program {
 @Entity()
 export class Team implements Node {
 
-  @PrimaryColumn()
   id: string;
 
   internalId?: string;
 
-  @Column()
+  @PrimaryColumn({ enum: Program })
   program: Program;
 
-  @Column()
+  @PrimaryColumn({ type: 'varchar' })
   number: string;
 
   @Column({ nullable: true })

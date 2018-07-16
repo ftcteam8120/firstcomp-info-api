@@ -1,4 +1,4 @@
-import { EntityManager, ObjectType, EntitySchema } from 'typeorm';
+import { EntityManager, ObjectType, EntitySchema, Any } from 'typeorm';
 import { Service } from 'typedi';
 import * as _ from 'lodash';
 import { FindResult } from '../service/FIRSTSearch';
@@ -23,22 +23,31 @@ export class DataMerge {
 
   public async mergeMany<T extends Node>(
     entityClass: ObjectType<any> | EntitySchema<any> | string,
-    firstData: FindResult<T>
+    firstData: FindResult<T>,
+    findFields: string[]
   ): Promise<FindResult<T>> {
-    const ids: string[] = [];
+    const fields: any = {};
     const nodes: T[] = [];
-    // Fill the array of IDs to search for
-    for (let i = 0; i < firstData.data.length; i += 1) {
-      ids.push(firstData.data[i].id);
+    const query: any = {};
+    // Fill the fields object with search parameters
+    for (const data of firstData.data) {
+      // Loop through all find fields
+      for (const field of findFields) {
+        // If the field is not filled, make it an array
+        if (!fields[field]) fields[field] = [];
+        // Add the query to the fields
+        fields[field].push(data[field]);
+      }
     }
-    // Find all those IDs locally
-    const localData = await this.entityManager.findByIds(entityClass, ids);
-    for (let i = 0; i < firstData.data.length; i += 1) {
-      // Push the merged data into the nodes array
+    for (const data of firstData.data) {
+      // Build a query for lodash
+      for (const field in fields) {
+        query[field] = data[field];
+      }
       nodes.push(_.mergeWith(
         {},
-        firstData.data[i],
-        _.find(localData, ['id', firstData.data[i].id]),
+        data,
+        await this.entityManager.findOne(entityClass, query),
         (a, b) => b === null ? a : undefined
       ));
     }

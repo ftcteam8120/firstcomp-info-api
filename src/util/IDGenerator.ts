@@ -29,12 +29,25 @@ export class IDGenerator {
     if (split[0] !== 'Team') throw new Error('Invalid Team ID');
     return {
       program: Program[split[1]] as Program,
-      number: split[2] as number
+      number: split[2] * 1
     };
   }
 
   public event(code: string): string {
     return this.btoa('Event-' + code);
+  }
+
+  public match(number: number, eventId: string): string {
+    return this.btoa('Match-' + eventId + '-' + number.toString());
+  }
+
+  public decodeMatch(id: string): { number: number, eventCode: string } {
+    const split: any[] = this.atob(id).split('-');
+    if (split[0] !== 'Match') throw new Error('Invalid Match ID');
+    return {
+      number: split[1] * 1,
+      eventCode: this.decodeEvent(split[2]).code
+    };
   }
 
   public decodeEvent(id: string): { code: string } {

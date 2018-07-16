@@ -6,14 +6,14 @@ import { Node } from './Node';
 @Entity()
 export class Match implements Node {
 
-  @PrimaryColumn()
   id: string;
 
-  @Column()
-  number: string;
+  @PrimaryColumn({ type: 'int' })
+  number: number;
 
+  @PrimaryColumn({ type: 'varchar', name: 'eventCode' })
   @ManyToOne(type => Event, event => event.matches)
-  event: Event;
+  event: Event | string;
 
   @Column({ type: 'time', nullable: true })
   actualStartTime?: Date;

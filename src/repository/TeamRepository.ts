@@ -50,7 +50,8 @@ export class TeamRepository {
     Promise<FindResult<Team>> {
     return this.dataMerge.mergeMany<Team>(
       Team,
-      await this.firstSearch.findTeams(first, after, filter, orderBy)
+      await this.firstSearch.findTeams(first, after, filter, orderBy),
+      ['program', 'number']
     );
   }
 

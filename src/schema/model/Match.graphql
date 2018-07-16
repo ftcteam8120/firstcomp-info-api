@@ -1,0 +1,20 @@
+type Match implements Node {
+  id: ID!
+  number: Int
+  event: Event
+  actualStartTime: String
+  description: String
+  postResultTime: String
+  scoreRedTeleop: Int
+  scoreRedFoul: Int
+  scoreRedAuto: Int
+  scoreRedAutoBonus: Int
+  scoreRedEnd: Int
+  scoreBlueTeleop: Int
+  scoreBlueFoul: Int
+  scoreBlueAuto: Int
+  scoreBlueAutoBonus: Int
+  scoreBlueEnd: Int
+  details: String
+  teams: [MatchTeam]
+}

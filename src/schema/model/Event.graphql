@@ -39,6 +39,7 @@ type Event implements Node {
   type: EventType
   website: String
   program: Program
+  matches: [Match]
 }
 
 type EventEdge {

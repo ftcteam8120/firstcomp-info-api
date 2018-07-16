@@ -1,29 +1,34 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
 import { Match } from './Match';
-import { Team } from './Team';
+import { Team, Program } from './Team';
 import { Node } from './Node';
 
 export enum Station {
-  BLUE1 = 'Blue1',
-  BLUE2 = 'Blue2',
-  BLUE3 = 'Blue3',
-  RED1 = 'Red1',
-  RED2 = 'Red2',
-  RED3 = 'Red3'
+  Blue1 = 'Blue1',
+  Blue2 = 'Blue2',
+  Blue3 = 'Blue3',
+  Red1 = 'Red1',
+  Red2 = 'Red2',
+  Red3 = 'Red3'
 }
 
 @Entity()
-export class MatchTeam implements Node {
+export class MatchTeam {
 
-  @PrimaryColumn()
-  id: string;
-
+  @PrimaryColumn({ type: 'varchar', name: 'matchEvent' })
   @ManyToOne(type => Match, match => match.teams)
-  match: Match;
+  match: Match | string;
 
+  @PrimaryColumn({ type: 'int', name: 'matchNumber' })
+  matchNumber: number;
+
+  @PrimaryColumn({ type: 'varchar', name: 'teamNumber' })
   @OneToOne(type => Team)
   @JoinColumn()
-  team: Team;
+  team: Team | number;
+
+  @PrimaryColumn({ enum: Program, name: 'teamProgram' })
+  teamProgram: Program;
 
   @Column({ enum: Station })
   station: Station;

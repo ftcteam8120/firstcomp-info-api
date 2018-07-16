@@ -1,0 +1,15 @@
+enum Station {
+  Blue1
+  Blue2
+  Blue3
+  Red1
+  Red2
+  Red3
+}
+
+type MatchTeam {
+  team: Team
+  station: Station
+  dq: Boolean
+  surrogate: Boolean
+}
