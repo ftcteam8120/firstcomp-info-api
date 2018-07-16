@@ -41,6 +41,7 @@ type Event implements Node {
   program: Program
   matches: [Match]
   alliances: [Alliance]
+  awards: [Award]
 }
 
 type EventEdge {

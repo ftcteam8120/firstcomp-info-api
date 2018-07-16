@@ -4,6 +4,7 @@ import { Match } from './Match';
 import { User } from './User';
 import { Node } from './Node';
 import { Alliance } from './Alliance';
+import { Award } from './Award';
 
 export enum EventType {
   KICKOFF = 'KICKOFF',
@@ -85,6 +86,9 @@ export class Event implements Node {
 
   @OneToMany(type => Alliance, alliance => alliance.event)
   alliances?: Alliance[];
+
+  @OneToMany(type => Award, award => award.event)
+  awards?: Award[];
 
 }
 

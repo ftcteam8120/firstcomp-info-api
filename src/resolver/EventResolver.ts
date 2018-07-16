@@ -5,6 +5,7 @@ import { Alliance } from '../entity/Alliance';
 import { FIRSTSearch } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { EntityManager } from 'typeorm';
+import { Award } from '../entity/Award';
 
 @Resolver(Event)
 export class EventResolver {
@@ -46,6 +47,20 @@ export class EventResolver {
         alliance.event = event;
       }
       return alliances;
+    });
+  }
+
+  @Resolve()
+  awards(event: Event) {
+    return this.entityManager.find(Award, {
+      event: event.code
+    }).then((awards: Award[]) => {
+      if (!awards) return [];
+      // Add event data to all the awards
+      for (const award of awards) {
+        award.event = event;
+      }
+      return awards;
     });
   }
 

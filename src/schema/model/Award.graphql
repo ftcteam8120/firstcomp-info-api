@@ -1,0 +1,6 @@
+type Award {
+  team: Team
+  person: String
+  name: String
+  series: Int
+}
