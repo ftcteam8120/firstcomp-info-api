@@ -21,8 +21,8 @@ export class Team implements Node {
   @PrimaryColumn({ enum: Program })
   program: Program;
 
-  @PrimaryColumn({ type: 'varchar' })
-  number: string;
+  @PrimaryColumn({ type: 'int' })
+  number: number;
 
   @Column({ nullable: true })
   homeCmp?: string;

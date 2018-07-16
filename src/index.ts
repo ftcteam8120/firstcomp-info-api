@@ -29,6 +29,7 @@ import { Event } from './entity/Event';
 import { Match } from './entity/Match';
 import { Team } from './entity/Team';
 import { MatchTeam } from './entity/MatchTeam';
+import { Alliance } from './entity/Alliance';
 
 // Import resolvers
 import { resolveType } from './entity/Node';
@@ -36,6 +37,7 @@ import { TeamResolver } from './resolver/TeamResolver';
 import { EventResolver } from './resolver/EventResolver';
 import { MatchResolver } from './resolver/MatchResolver';
 import { MatchTeamResolver } from './resolver/MatchTeamResolver';
+import { AllianceResolver } from './resolver/AllianceResolver';
 
 // Start vesper
 bootstrap({
@@ -53,13 +55,15 @@ bootstrap({
     Event,
     Match,
     Team,
-    MatchTeam
+    MatchTeam,
+    Alliance
   ],
   resolvers: [
     TeamResolver,
     EventResolver,
     MatchResolver,
-    MatchTeamResolver
+    MatchTeamResolver,
+    AllianceResolver
   ],
   customResolvers: {
     Node: {

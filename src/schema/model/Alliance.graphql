@@ -1,0 +1,10 @@
+type Alliance {
+  number: Int!
+  name: String
+  captain: Team
+  round1: Team
+  round2: Team
+  round3: Team
+  backup: Team
+  backupReplaced: Team
+}

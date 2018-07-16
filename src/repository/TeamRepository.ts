@@ -25,7 +25,7 @@ export class TeamRepository {
       await this.firstSearch.findTeam(id),
       await this.entityManager.findOne(Team, {
         program: teamData.program,
-        number: teamData.number.toString()
+        number: teamData.number
       })
     );
   }

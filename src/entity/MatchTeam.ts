@@ -22,7 +22,7 @@ export class MatchTeam {
   @PrimaryColumn({ type: 'int', name: 'matchNumber' })
   matchNumber: number;
 
-  @PrimaryColumn({ type: 'varchar', name: 'teamNumber' })
+  @PrimaryColumn({ type: 'int', name: 'teamNumber' })
   @OneToOne(type => Team)
   @JoinColumn()
   team: Team | number;

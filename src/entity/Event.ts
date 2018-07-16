@@ -3,6 +3,7 @@ import { Program } from './Team';
 import { Match } from './Match';
 import { User } from './User';
 import { Node } from './Node';
+import { Alliance } from './Alliance';
 
 export enum EventType {
   KICKOFF = 'KICKOFF',
@@ -81,6 +82,9 @@ export class Event implements Node {
 
   @OneToMany(type => Match, match => match.event)
   matches?: Match[];
+
+  @OneToMany(type => Alliance, alliance => alliance.event)
+  alliances?: Alliance[];
 
 }
 
