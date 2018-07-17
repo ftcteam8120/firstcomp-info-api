@@ -17,8 +17,8 @@ export class User implements Node {
   @Column()
   email: string;
 
-  @Column()
-  password: string;
+  @Column({ nullable: true })
+  password?: string;
 
   /**
    * The OAuth2 provider

@@ -1,5 +1,6 @@
 import { Entity } from 'typeorm';
 import { IDGenerator } from '../util/IDGenerator';
+import { Container } from 'typedi';
 
 @Entity()
 export abstract class Node {
@@ -26,5 +27,5 @@ export interface Connection<T> {
 }
 
 export function resolveType(data: Node): string {
-  return new IDGenerator().getNodeType(data.id);
+  return Container.get(IDGenerator).getNodeType(data.id);
 }

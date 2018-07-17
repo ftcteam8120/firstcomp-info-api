@@ -1,4 +1,4 @@
-import { Resolver, Resolve } from 'vesper';
+import { Resolver, Resolve, Authorized } from 'vesper';
 import { Event } from '../entity/Event';
 import { Match } from '../entity/Match';
 import { Alliance } from '../entity/Alliance';
@@ -22,6 +22,7 @@ export class EventResolver {
   }
 
   @Resolve()
+  @Authorized(['match:read'])
   matches(event: Event) {
     return this.entityManager.find(Match, {
       event: event.code
@@ -37,6 +38,7 @@ export class EventResolver {
   }
 
   @Resolve()
+  @Authorized(['alliance:read'])
   alliances(event: Event) {
     return this.entityManager.find(Alliance, {
       event: event.code
@@ -51,6 +53,7 @@ export class EventResolver {
   }
 
   @Resolve()
+  @Authorized(['award:read'])
   awards(event: Event) {
     return this.entityManager.find(Award, {
       event: event.code
