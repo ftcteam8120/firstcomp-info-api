@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToMany,
+  Index
+} from 'typeorm';
 import { Event } from './Event';
 import { Node } from './Node';
 
@@ -15,6 +22,7 @@ export class User implements Node {
   lastName: string;
 
   @Column()
+  @Index({ unique: true })
   email: string;
 
   @Column({ nullable: true })
@@ -46,5 +54,8 @@ export class User implements Node {
   
   @ManyToMany(type => Event, event => event.admins)
   events: Event[];
+
+  @Column({ nullable: true })
+  role?: string;
 
 }

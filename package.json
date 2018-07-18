@@ -18,9 +18,11 @@
   "dependencies": {
     "bcrypt": "^3.0.0",
     "dotenv": "^6.0.0",
+    "email-validator": "^2.0.4",
     "ioredis": "^3.2.2",
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.1.2",
+    "password-validator": "^4.1.1",
     "pg": "^7.4.3",
     "uuid-validate": "^0.0.3",
     "vesper": "^0.1.9"

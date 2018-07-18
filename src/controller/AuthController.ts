@@ -23,7 +23,7 @@ export class AuthController {
       return bcrypt.compare(password, user.password).then(async (valid: boolean) => {
         if (!valid) throw new Error('Invalid username or password');
         // Load the user role
-        const userRole = await this.scopeTools.findRole('user');
+        const userRole = await this.scopeTools.findRole(user.role || 'user');
         // Create the JWT with an expiration in a week
         return this.jwt.createToken(user.id, userRole.scopes, (60 * 60 * 24 * 7));
       });

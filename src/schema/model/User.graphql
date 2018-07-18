@@ -7,3 +7,11 @@ type User implements Node {
   photoUrl: String
   providerId: String
 }
+
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  photoUrl: String
+}
