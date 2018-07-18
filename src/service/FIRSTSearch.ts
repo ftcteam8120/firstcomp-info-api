@@ -102,7 +102,9 @@ export class FIRSTSearch {
       dateEnd: data.date_end,
       type: this.convertEventType(data.event_subtype),
       website: data.event_web_url,
-      program: data.event_type
+      program: data.event_type,
+      season: data.event_season,
+      seasonId: data.fk_program_seasons ? this.idGenerator.season(data.fk_program_seasons) : null
     };
   }
 
@@ -119,7 +121,8 @@ export class FIRSTSearch {
     dateStart: 'date_start',
     dateEnd: 'date_end',
     website: 'event_web_url',
-    program: 'event_type'
+    program: 'event_type',
+    season: 'event_season'
   };
 
   private convertSeason(id: string, data: any): Season {
@@ -221,7 +224,7 @@ export class FIRSTSearch {
     return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
       query: {
         query_string: {
-          query: `event_code: ${eventData.code}`
+          query: `event_code: ${eventData.code} AND event_season: ${eventData.season}`
         }
       }
     }).then((result: ElasticResult) => {
@@ -302,7 +305,13 @@ export class FIRSTSearch {
       } : {})
     }).then((result: ElasticResult) => {
       const converted = this.convertAll(result, first, after, (nodeRaw) => {
-        return this.convertEvent(this.idGenerator.event(nodeRaw.event_code), nodeRaw);
+        return this.convertEvent(
+          this.idGenerator.event(
+            nodeRaw.event_season,
+            nodeRaw.event_code
+          ),
+          nodeRaw
+        );
       });
       // Cache all events
       const cachePromises = [];

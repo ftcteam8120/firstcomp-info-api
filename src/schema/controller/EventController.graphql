@@ -1,5 +1,6 @@
 type Query {
   event(id: ID!): Event
-  eventByCode(code: String!): Event
+  eventByCode(seasonId: ID!, code: String!): Event
+  eventByYearCode(year: Int!, code: String!): Event
   events(first: Int, after: String, filter: EventFilter, orderBy: [EventOrder]): EventConnection
 }

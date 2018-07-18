@@ -12,6 +12,9 @@ export class Award {
   @ManyToOne(type => Event, event => event.awards)
   event: Event | string;
 
+  @PrimaryColumn({ type: 'int', name: 'eventSeason' })
+  eventSeason: number;
+
   @PrimaryColumn({ type: 'int' })
   series: number;
 

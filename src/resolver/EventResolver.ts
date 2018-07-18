@@ -22,6 +22,11 @@ export class EventResolver {
   }
 
   @Resolve()
+  season(event: Event) {
+    return this.firstSearch.findSeason(event.seasonId);
+  }
+
+  @Resolve()
   @Authorized(['match:read'])
   matches(event: Event) {
     return this.entityManager.find(Match, {
@@ -30,7 +35,10 @@ export class EventResolver {
       if (!matches) return [];
       // Add IDs and the event data to all the matches
       for (const match of matches) {
-        match.id = this.idGenerator.match(match.number, match.event as string);
+        match.id = this.idGenerator.match(
+          match.number,
+          (match.event as Event).id
+        );
         match.event = event;
       }
       return matches;

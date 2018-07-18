@@ -41,6 +41,9 @@ export class Event implements Node {
   @PrimaryColumn({ type: 'varchar' })
   code: string;
 
+  @PrimaryColumn({ type: 'int' })
+  season: number;
+
   @ManyToMany(type => User)
   @JoinTable()
   admins?: User[];
@@ -89,6 +92,8 @@ export class Event implements Node {
 
   @OneToMany(type => Award, award => award.event)
   awards?: Award[];
+
+  seasonId?: string;
 
 }
 

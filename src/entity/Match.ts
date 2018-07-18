@@ -15,6 +15,9 @@ export class Match implements Node {
   @ManyToOne(type => Event, event => event.matches)
   event: Event | string;
 
+  @PrimaryColumn({ type: 'int', name: 'eventSeason' })
+  eventSeason: number;
+
   @Column({ type: 'time', nullable: true })
   actualStartTime?: Date;
 

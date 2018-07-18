@@ -2,13 +2,15 @@ import { Controller, Query, Authorized } from 'vesper';
 import { EventRepository } from '../repository/EventRepository';
 import { Paginator } from '../util/Paginator';
 import { EventOrder } from '../entity/Event';
+import { FIRSTSearch } from '../service/FIRSTSearch';
 
 @Controller()
 export class EventController {
 
   constructor(
     private eventRepository: EventRepository,
-    private paginator: Paginator
+    private paginator: Paginator,
+    private firstSearch: FIRSTSearch
   ) { }
 
   @Query()
@@ -19,8 +21,15 @@ export class EventController {
 
   @Query()
   @Authorized(['event:read'])
-  eventByCode({ code }) {
-    return this.eventRepository.findByCode(code);
+  async eventByCode({ seasonId, code }) {
+    const seasonYear = (await this.firstSearch.findSeason(seasonId)).startYear;
+    return this.eventRepository.findByCode(seasonYear, code);
+  }
+
+  @Query()
+  @Authorized(['event:read'])
+  eventByYearCode({ year, code }) {
+    return this.eventRepository.findByCode(year, code);
   }
 
   @Query()

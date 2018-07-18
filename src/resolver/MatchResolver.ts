@@ -21,6 +21,10 @@ export class MatchResolver {
       matchEvent: match.event
     } as any).then((matchTeams: MatchTeam[]) => {
       if (!matchTeams) return [];
+      // Set the match data for all the match teams
+      for (const team of matchTeams) {
+        team.match = match;
+      }
       return matchTeams;
     });
   }

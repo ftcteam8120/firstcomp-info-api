@@ -38,7 +38,8 @@ export const SCOPES: Scope[] = [
       'website',
       'matches',
       'alliances',
-      'awards'
+      'awards',
+      'year'
     ]
   },
   {

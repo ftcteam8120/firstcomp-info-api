@@ -11,6 +11,9 @@ if (process.env.NODE_ENV !== 'prod') {
 const REDIS_URL = process.env.REDIS_URL;
 const PORT = parseInt(process.env.PORT, 2) || 3000;
 export const JWT_SECRET = process.env.JWT_SECRET;
+export const FRC_API_USER = process.env.FRC_API_USER;
+export const FRC_API_KEY = process.env.FRC_API_KEY;
+export const FRC_API_URL = process.env.FRC_API_URL;
 
 import { RedisCache } from './util/RedisCache';
 

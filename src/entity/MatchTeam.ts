@@ -19,16 +19,14 @@ export class MatchTeam {
   @ManyToOne(type => Match, match => match.teams)
   match: Match | string;
 
+  @PrimaryColumn({ type: 'int', name: 'matchEventSeason' })
+  matchEventSeason: number;
+
   @PrimaryColumn({ type: 'int', name: 'matchNumber' })
   matchNumber: number;
 
   @PrimaryColumn({ type: 'int', name: 'teamNumber' })
-  @OneToOne(type => Team)
-  @JoinColumn()
   team: Team | number;
-
-  @PrimaryColumn({ enum: Program, name: 'teamProgram' })
-  teamProgram: Program;
 
   @Column({ enum: Station })
   station: Station;

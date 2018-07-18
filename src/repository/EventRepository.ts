@@ -20,20 +20,20 @@ export class EventRepository {
    * @param id The event ID
    */
   public async findById(id: string): Promise<Event> {
+    const decoded = this.idGenerator.decodeEvent(id);
     return this.dataMerge.mergeOne<Event>(
       await this.firstSearch.findEvent(id),
-      await this.entityManager.findOne(Event, {
-        code: this.idGenerator.decodeEvent(id).code
-      })
+      await this.entityManager.findOne(Event, decoded)
     );
   }
   
   /**
    * Find an event by code
+   * @param year The event year
    * @param code The event code
    */
-  public async findByCode(code: string): Promise<Event> {
-    return this.findById(this.idGenerator.event(code));
+  public async findByCode(year: number, code: string): Promise<Event> {
+    return this.findById(this.idGenerator.event(year, code));
   }
 
   /**

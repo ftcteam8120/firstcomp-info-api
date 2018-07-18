@@ -9,6 +9,9 @@ export class Alliance {
   @ManyToOne(type => Event, event => event.alliances)
   event: Event | string;
 
+  @PrimaryColumn({ type: 'int', name: 'eventSeason' })
+  eventSeason: number;
+
   @PrimaryColumn()
   number: number;
 

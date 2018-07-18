@@ -29,6 +29,7 @@ type Event implements Node {
   address: String
   name: String!
   description: String
+  season: Season
   venue: String
   city: String
   countryCode: String
@@ -88,4 +89,6 @@ enum EventOrder {
   website_DESC
   program_ASC
   program_DESC
+  season_ASC
+  season_DESC
 }

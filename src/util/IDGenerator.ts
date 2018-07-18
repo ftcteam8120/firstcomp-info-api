@@ -33,28 +33,30 @@ export class IDGenerator {
     };
   }
 
-  public event(code: string): string {
-    return this.btoa('Event-' + code);
+  public event(season: number, code: string): string {
+    return this.btoa('Event-' + season.toString() + '-' + code);
   }
 
   public match(number: number, eventId: string): string {
     return this.btoa('Match-' + eventId + '-' + number.toString());
   }
 
-  public decodeMatch(id: string): { number: number, eventCode: string } {
+  public decodeMatch(id: string): { number: number, eventSeason: number, eventCode: string } {
     const split: any[] = this.atob(id).split('-');
     if (split[0] !== 'Match') throw new Error('Invalid Match ID');
     return {
       number: split[1] * 1,
+      eventSeason: this.decodeEvent(split[2]).season,
       eventCode: this.decodeEvent(split[2]).code
     };
   }
 
-  public decodeEvent(id: string): { code: string } {
+  public decodeEvent(id: string): { season: number, code: string } {
     const split: any[] = this.atob(id).split('-');
     if (split[0] !== 'Event') throw new Error('Invalid Event ID');
     return {
-      code: split[1]
+      season: split[1] * 1,
+      code: split[2]
     };
   }
 

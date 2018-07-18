@@ -1,10 +1,11 @@
 import { Resolver, Resolve } from 'vesper';
 import { MatchTeam } from '../entity/MatchTeam';
-import { Team } from '../entity/Team';
 import { FIRSTSearch } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { EntityManager } from 'typeorm';
 import { TeamRepository } from '../repository/TeamRepository';
+import { Match } from '../entity/Match';
+import { Event } from '../entity/Event';
 
 @Resolver(MatchTeam)
 export class MatchTeamResolver {
@@ -18,7 +19,10 @@ export class MatchTeamResolver {
 
   @Resolve()
   team(matchTeam: MatchTeam) {
-    return this.teamRepository.findByNumber(matchTeam.teamProgram, matchTeam.team as number);
+    return this.teamRepository.findByNumber(
+      ((matchTeam.match as Match).event as Event).program,
+      matchTeam.team as number
+    );
   }
 
 }
