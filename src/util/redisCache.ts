@@ -29,6 +29,22 @@ export class RedisCache {
   }
 
   /**
+   * Caches a single object in Redis with a custom key
+   * @param key The redis key
+   * @param value The object itself
+   * @param expire (optional, default is 3600) Expiration (in seconds)
+   */
+  public async setKey(
+    key: string,
+    value: Node,
+    expire: number = 3600
+  ) {
+    const val = JSON.stringify(value);
+    await RedisCache.redis.set(key, val);
+    await RedisCache.redis.expire(value.id, expire);
+  }
+
+  /**
    * Gets a cached object
    * @param id The object's ID
    */

@@ -7,7 +7,7 @@ import { IDGenerator } from '../util/IDGenerator';
 import { EntityManager } from 'typeorm';
 import { Award } from '../entity/Award';
 import { Program } from '../entity/Team';
-import TheBlueAlliance from '../service/TheBlueAlliance';
+import { TheBlueAlliance } from '../service/TheBlueAlliance';
 
 @Resolver(Event)
 export class EventResolver {

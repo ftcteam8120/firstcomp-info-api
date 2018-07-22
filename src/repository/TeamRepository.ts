@@ -4,6 +4,7 @@ import { Team, Program, TeamFilter, TeamOrder } from '../entity/Team';
 import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { DataMerge } from '../util/DataMerge';
+import { RedisCache } from '../util/RedisCache';
 
 @Service()
 export class TeamRepository {
@@ -12,7 +13,8 @@ export class TeamRepository {
     private entityManager: EntityManager,
     private firstSearch: FIRSTSearch,
     private idGenerator: IDGenerator,
-    private dataMerge: DataMerge
+    private dataMerge: DataMerge,
+    private redisCache: RedisCache
   ) { }
 
   /**
@@ -20,14 +22,20 @@ export class TeamRepository {
    * @param id The team ID
    */
   public async findById(id: string): Promise<Team> {
+    // Check for a cached value
+    const cached = await this.redisCache.get<Team>(id);
+    if (cached) return cached;
     const teamData = this.idGenerator.decodeTeam(id);
-    return this.dataMerge.mergeOne<Team>(
+    const team = this.dataMerge.mergeOne<Team>(
       await this.firstSearch.findTeam(id),
       await this.entityManager.findOne(Team, {
         program: teamData.program,
         number: teamData.number
       })
     );
+    // Cache the team
+    await this.redisCache.set(team);
+    return team;
   }
   
   /**

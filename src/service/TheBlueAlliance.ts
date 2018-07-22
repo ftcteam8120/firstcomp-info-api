@@ -27,7 +27,7 @@ interface ScoreData {
 }
 
 @Service()
-export default class TheBlueAlliance {
+export class TheBlueAlliance  {
 
   constructor(
     private idGenerator: IDGenerator,

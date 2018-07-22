@@ -158,10 +158,7 @@ export class FIRSTSearch {
    * @param id The team ID
    */
   public async findTeam(id: string): Promise<Team> {
-    // Check for a cached value
-    const cached = await this.redisCache.get<Team>(id);
     const teamData = this.idGenerator.decodeTeam(id);
-    if (cached) return cached;
     // Otherwise, query the server
     return this.elasticSearch.query('https://es01.usfirst.org/teams/_search', {
       query: {
@@ -179,11 +176,7 @@ export class FIRSTSearch {
         return null;
       }
       const teamRaw = result.hits[0];
-      const team: Team = this.convertTeam(id, teamRaw);
-      // Cache the team
-      return this.redisCache.set(team).then(() => {
-        return team;
-      });
+      return this.convertTeam(id, teamRaw);
     });
   }
 
@@ -214,10 +207,7 @@ export class FIRSTSearch {
    * @param id The event ID
    */
   public async findEvent(id: string): Promise<Event> {
-    // Check for a cached value
-    const cached = await this.redisCache.get<Event>(id);
     const eventData = this.idGenerator.decodeEvent(id);
-    if (cached) return cached;
     // Otherwise, query the server
     return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
       query: {
@@ -230,11 +220,7 @@ export class FIRSTSearch {
         return null;
       }
       const eventRaw = result.hits[0];
-      const event: Event = this.convertEvent(id, eventRaw);
-      // Cache the event
-      return this.redisCache.set(event).then(() => {
-        return event;
-      });
+      return this.convertEvent(id, eventRaw);
     }).catch(() => {
       return null;
     });

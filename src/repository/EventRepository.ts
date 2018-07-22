@@ -5,7 +5,8 @@ import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { DataMerge } from '../util/DataMerge';
 import { Program } from '../entity/Team';
-import TheBlueAlliance from '../service/TheBlueAlliance';
+import { TheBlueAlliance } from '../service/TheBlueAlliance';
+import { RedisCache } from '../util/RedisCache';
 
 @Service()
 export class EventRepository {
@@ -15,7 +16,8 @@ export class EventRepository {
     private firstSearch: FIRSTSearch,
     private idGenerator: IDGenerator,
     private dataMerge: DataMerge,
-    private theBlueAlliance: TheBlueAlliance
+    private theBlueAlliance: TheBlueAlliance,
+    private redisCache: RedisCache
   ) { }
 
   /**
@@ -23,12 +25,18 @@ export class EventRepository {
    * @param id The event ID
    */
   public async findById(id: string): Promise<Event> {
+    // Check for a cached value
+    const cached = await this.redisCache.get<Event>(id);
+    if (cached) return cached;
     const decoded = this.idGenerator.decodeEvent(id);
-    return this.dataMerge.mergeOne<Event>(
+    const event = this.dataMerge.mergeOne<Event>(
       await this.theBlueAlliance.findEvent(id),
       await this.firstSearch.findEvent(id),
       await this.entityManager.findOne(Event, decoded)
     );
+    // Cache the event
+    await this.redisCache.set(event);
+    return event;
   }
   
   /**
