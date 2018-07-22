@@ -52,8 +52,8 @@ type Event implements Node {
   timezone: String
   stateProv: String
   postalCode: String
-  dateStart: DateTime
-  dateEnd: DateTime
+  dateStart: Date
+  dateEnd: Date
   type: EventType
   website: String
   program: Program

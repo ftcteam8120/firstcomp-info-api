@@ -12,19 +12,22 @@ type Team implements Node {
   id: ID!
   program: Program!
   number: Int!
-  homeCmp: String
   name: String
   sponsors: String
+  robots: [Robot]
   city: String
   stateProv: String
   countryCode: String
   country: Country
   rookieYear: Int
-  robotName: String
   districtCode: String
   website: String
   season: Season
   profileYear: Int
+  awards: [Award]
+  events: [Event]
+  media(year: Int!): [Media]
+  socialMedia: [SocialMedia]
 }
 
 type TeamEdge {

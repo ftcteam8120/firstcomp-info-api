@@ -25,9 +25,6 @@ export class Team implements Node {
   number: number;
 
   @Column({ nullable: true })
-  homeCmp?: string;
-
-  @Column({ nullable: true })
   name?: string;
 
   @Column({ nullable: true })
@@ -44,9 +41,6 @@ export class Team implements Node {
 
   @Column({ nullable: true })
   rookieYear?: number;
-
-  @Column({ nullable: true })
-  robotName?: string;
 
   @Column({ nullable: true })
   districtCode?: string;

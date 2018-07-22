@@ -3,13 +3,16 @@ import { TBA_KEY, TBA_URL } from '../';
 import { IDGenerator } from '../util/IDGenerator';
 import { RedisCache } from '../util/RedisCache';
 import fetch from 'node-fetch';
-import { Event, EventType } from '../entity/Event';
-import { Program } from '../entity/Team';
+import { Event, EventType, PlayoffType } from '../entity/Event';
+import { Program, Team } from '../entity/Team';
 import { Match, MatchLevel } from '../entity/Match';
 import { MatchTeam, Side } from '../entity/MatchTeam';
 import { Alliance } from '../entity/Alliance';
 import { Award, AwardType } from '../entity/Award';
 import { AwardRecipient } from '../entity/AwardRecipient';
+import { Robot } from '../entity/Robot';
+import { Media, MediaType } from '../entity/Media';
+import { SocialMedia, SocialMediaType } from '../entity/SocialMedia';
 
 interface ScoreData {
   scoreRedTeleop?: number;
@@ -42,14 +45,17 @@ export class TheBlueAlliance  {
     }).then(res => res.json());
   }
 
-  private async convertEvent(id: string, data: any): Promise<Event> {
+  private convertEvent(id: string, data: any): Event {
     return {
       id,
-      code: data.first_event_code,
+      code: (data.event_code as string).toUpperCase(),
       name: data.name,
       divisions: this.convertDivisions(data.division_keys),
+      playoffType: this.convertPlayoffType(data.playoff_type),
       address: data.address,
       venue: data.location_name,
+      dateStart: new Date(Date.parse(data.start_date)),
+      dateEnd: new Date(Date.parse(data.end_date)),
       city: data.city,
       countryCode: data.country,
       stateProv: data.state_prov,
@@ -59,6 +65,19 @@ export class TheBlueAlliance  {
       program: Program.FRC,
       season: data.year
     };
+  }
+
+  private convertPlayoffType(type: number): PlayoffType {
+    switch (type) {
+      case 0: return PlayoffType.BRACKET_8_TEAM;
+      case 1: return PlayoffType.BRACKET_16_TEAM;
+      case 2: return PlayoffType.BRACKET_4_TEAM;
+      case 3: return PlayoffType.AVG_SCORE_8_TEAM;
+      case 4: return PlayoffType.ROUND_ROBIN_6_TEAM;
+      case 5: return PlayoffType.DOUBLE_ELIM_8_TEAM;
+      case 6: return PlayoffType.BO5_FINALS;
+      case 7: return PlayoffType.BO3_FINALS;
+    }
   }
 
   private convertEventType(type: number): EventType {
@@ -95,7 +114,7 @@ export class TheBlueAlliance  {
       'event/' + eventData.season + eventData.code.toLowerCase()
     ).then((rawEvent: any) => {
       return this.convertEvent(
-        this.idGenerator.event(rawEvent.year, rawEvent.first_event_code),
+        this.idGenerator.event(rawEvent.year, (rawEvent.event_code as string).toUpperCase()),
         rawEvent
       );
     });
@@ -351,6 +370,7 @@ export class TheBlueAlliance  {
       event,
       type: this.convertAwardType(data.award_type),
       name: data.name,
+      year: data.year,
       recipients: []
     };
     const recipients: AwardRecipient[] = [];
@@ -375,6 +395,120 @@ export class TheBlueAlliance  {
         awards.push(this.convertAward(event, data));
       }
       return awards;
+    });
+  }
+
+  private convertRobot(data: any): Robot {
+    return {
+      year: data.year,
+      name: data.robot_name
+    };
+  }
+
+  public async findTeamRobots(team: Team): Promise<Robot[]> {
+    return this.request(
+      'team/frc' + team.number.toString() +
+      '/robots'
+    ).then((rawRobots: any) => {
+      const robots: Robot[] = [];
+      for (const data of rawRobots) {
+        robots.push(this.convertRobot(data));
+      }
+      return robots;
+    });
+  }
+
+  public async findTeamAwards(team: Team): Promise<Award[]> {
+    return this.request(
+      'team/frc' + team.number.toString() +
+      '/awards'
+    ).then((rawAwards: any) => {
+      const awards: Award[] = [];
+      for (const data of rawAwards) {
+        awards.push(this.convertAward(null, data));
+      }
+      return awards;
+    });
+  }
+
+  public async findTeamEvents(team: Team): Promise<Event[]> {
+    return this.request(
+      'team/frc' + team.number.toString() +
+      '/events'
+    ).then((rawEvents: any) => {
+      const events: Event[] = [];
+      for (const data of rawEvents) {
+        events.push(
+          this.convertEvent(
+            this.idGenerator.event(data.year, (data.event_code as string).toUpperCase()),
+            data
+          )
+        );
+      }
+      return events;
+    });
+  }
+
+  private convertMediaType(type: string): MediaType {
+    switch (type) {
+      case 'youtube': return MediaType.YOUTUBE;
+      case 'cdphotothread': return MediaType.CDPHOTOTHREAD;
+      case 'imgur': return MediaType.IMGUR;
+      case 'grabcad': return MediaType.GRABCAD;
+      case 'instagram-image': return MediaType.INSTAGRAM_IMAGE;
+      case 'external-link': return MediaType.LINK;
+      case 'avatar': return MediaType.AVATAR;
+    }
+  }
+
+  private convertMedia(data: any): Media {
+    return {
+      type: this.convertMediaType(data.type),
+      key: data.foreign_key
+    };
+  }
+
+  public async findTeamMedia(team: Team, year: number): Promise<Media[]> {
+    return this.request(
+      'team/frc' + team.number.toString() +
+      '/media/' + year.toString()
+    ).then((rawMedia: any) => {
+      const media: Media[] = [];
+      for (const data of rawMedia) {
+        media.push(this.convertMedia(data));
+      }
+      return media;
+    });
+  }
+
+  private convertSocialMediaType(type: string): SocialMediaType {
+    switch (type) {
+      case 'facebook-profile': return SocialMediaType.FACEBOOK;
+      case 'youtube-channel': return SocialMediaType.YOUTUBE;
+      case 'twitter-profile': return SocialMediaType.TWITTER;
+      case 'github-profile': return SocialMediaType.GITHUB;
+      case 'instagram-profile': return SocialMediaType.INSTAGRAM;
+      case 'periscope-profile': return SocialMediaType.PERISCOPE;
+    }
+  }
+
+  private convertSocialMedia(data: any): SocialMedia {
+    return {
+      type: this.convertSocialMediaType(data.type),
+      username: data.foreign_key
+    };
+  }
+
+  public async findTeamSocialMedia(team: Team): Promise<SocialMedia[]> {
+    return this.request(
+      'team/frc' + team.number.toString() +
+      '/social_media'
+    ).then((rawMedia: any) => {
+      const media: SocialMedia[] = [];
+      for (const data of rawMedia) {
+        media.push(this.convertSocialMedia(data));
+      }
+      return media;
     });
   }
 

@@ -94,6 +94,9 @@ export class Award {
   @Column()
   name: string;
 
+  @Column()
+  year: number;
+
   @OneToMany(type => AwardRecipient, recipient => recipient.award)
   recipients: AwardRecipient[];
 

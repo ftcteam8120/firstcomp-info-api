@@ -1,0 +1,14 @@
+enum MediaType {
+  YOUTUBE
+  IMGUR
+  CDPHOTOTHREAD
+  GRABCAD
+  INSTAGRAM_IMAGE
+  LINK
+  AVATAR
+}
+
+type Media {
+  type: MediaType
+  key: String
+}

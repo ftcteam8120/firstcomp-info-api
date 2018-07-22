@@ -1,0 +1,13 @@
+enum SocialMediaType {
+  FACEBOOK
+  YOUTUBE
+  TWITTER
+  GITHUB
+  INSTAGRAM
+  PERISCOPE
+}
+
+type SocialMedia {
+  type: SocialMediaType
+  username: String
+}
