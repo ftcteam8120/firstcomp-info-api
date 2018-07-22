@@ -1,22 +1,30 @@
 import { Resolver, Resolve } from 'vesper';
 import { Award } from '../entity/Award';
 import { Event } from '../entity/Event';
-import { TeamRepository } from '../repository/TeamRepository';
+import { EntityManager } from 'typeorm';
+import { AwardRecipient } from '../entity/AwardRecipient';
 
 @Resolver(Award)
 export class AwardResolver {
 
   constructor(
-    private teamRepository: TeamRepository
+    private entityManager: EntityManager
   ) { }
 
   @Resolve()
-  team(award: Award) {
-    if (!award.team) return null;
-    return this.teamRepository.findByNumber(
-      (award.event as Event).program,
-      award.team as number
-    );
+  recipients(award: Award) {
+    if (award.recipients) return award.recipients;
+    return this.entityManager.find(AwardRecipient, {
+      award: award.type,
+      awardEvent: (award.event as Event).code,
+      awardEventSeason: (award.event as Event).season,
+    }).then((recipients: AwardRecipient[]) => {
+      // Add award data to all recipients
+      for (const recipient of recipients) {
+        recipient.award = award;
+      }
+      return recipients;
+    });
   }
 
 }

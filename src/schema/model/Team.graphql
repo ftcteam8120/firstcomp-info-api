@@ -14,7 +14,7 @@ type Team implements Node {
   number: Int!
   homeCmp: String
   name: String
-  schoolName: String
+  sponsors: String
   city: String
   stateProv: String
   countryCode: String
@@ -53,8 +53,6 @@ enum TeamOrder {
   number_DESC
   name_ASC
   name_DESC
-  schoolName_ASC
-  schoolName_DESC
   city_ASC
   city_DESC
   stateProv_ASC

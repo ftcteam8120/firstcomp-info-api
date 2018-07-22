@@ -16,6 +16,10 @@ export class MatchResolver {
 
   @Resolve()
   teams(match: Match) {
+    // If the match teams are already filled, return them
+    if (match.teams) {
+      return match.teams;
+    }
     return this.entityManager.find(MatchTeam, {
       matchNumber: match.number,
       matchEvent: match.event

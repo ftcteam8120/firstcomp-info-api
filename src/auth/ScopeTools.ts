@@ -75,7 +75,7 @@ export const SCOPES: Scope[] = [
     fields: [
       'homeCmp',
       'name',
-      'schoolName',
+      'sponsors',
       'city',
       'stateProv',
       'countryCode',

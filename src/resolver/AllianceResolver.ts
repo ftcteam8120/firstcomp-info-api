@@ -2,6 +2,7 @@ import { Resolver, Resolve } from 'vesper';
 import { Alliance } from '../entity/Alliance';
 import { Event } from '../entity/Event';
 import { TeamRepository } from '../repository/TeamRepository';
+import { Team } from '../entity/Team';
 
 @Resolver(Alliance)
 export class AllianceResolver {
@@ -20,30 +21,18 @@ export class AllianceResolver {
   }
 
   @Resolve()
-  round1(alliance: Alliance) {
-    if (!alliance.round1) return null;
-    return this.teamRepository.findByNumber(
-      (alliance.event as Event).program,
-      alliance.round1 as number
-    );
-  }
-
-  @Resolve()
-  round2(alliance: Alliance) {
-    if (!alliance.round2) return null;
-    return this.teamRepository.findByNumber(
-      (alliance.event as Event).program,
-      alliance.round2 as number
-    );
-  }
-
-  @Resolve()
-  round3(alliance: Alliance) {
-    if (!alliance.round3) return null;
-    return this.teamRepository.findByNumber(
-      (alliance.event as Event).program,
-      alliance.round3 as number
-    );
+  async picks(alliance: Alliance) {
+    if (!alliance.picks) return [];
+    const picks: Team[] = [];
+    for (const number of picks as any[]) {
+      picks.push(
+        await this.teamRepository.findByNumber(
+          (alliance.event as Event).program,
+          number as number
+        )
+      );
+    }
+    return picks;
   }
 
   @Resolve()

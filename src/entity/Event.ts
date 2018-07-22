@@ -7,6 +7,7 @@ import { Alliance } from './Alliance';
 import { Award } from './Award';
 
 export enum EventType {
+  UNLABLED = 'UNLABLED',
   KICKOFF = 'KICKOFF',
   WORKSHOP = 'WORKSHOP',
   SCRIMMAGE = 'SCRIMMAGE',
@@ -25,10 +26,22 @@ export enum EventType {
   CHAMPIONSHIP = 'CHAMPIONSHIP',
   WORLD_FESTIVAL = 'WORLD_FESTIVAL',
   OFF_SEASON = 'OFF_SEASON',
+  FOC = 'FOC',
   OFF_SEASON_WITH_AZURE_SYNC = 'OFF_SEASON_WITH_AZURE_SYNC',
   OFFICIAL_EXPO = 'OFFICIAL_EXPO',
   TRAINING_EDUCATION = 'TRAINING_EDUCATION',
   DISPLAY_DEMONSTRATION = 'DISPLAY_DEMONSTRATION'
+}
+
+export enum PlayoffType {
+  BRACKET_8_TEAM = 'BRACKET_8_TEAM',
+  BRACKET_16_TEAM = 'BRACKET_16_TEAM',
+  BRACKET_4_TEAM = 'BRACKET_4_TEAM',
+  AVG_SCORE_8_TEAM = 'AVG_SCORE_8_TEAM',
+  ROUND_ROBIN_6_TEAM = 'ROUND_ROBIN_6_TEAM',
+  DOUBLE_ELIM_8_TEAM = 'DOUBLE_ELIM_8_TEAM',
+  BO5_FINALS = 'BO5_FINALS',
+  BO3_FINALS = 'BO3_FINALS'
 }
 
 @Entity()
@@ -55,6 +68,9 @@ export class Event implements Node {
   name?: string;
 
   @Column({ nullable: true })
+  district?: string;
+
+  @Column({ nullable: true })
   description?: string;
 
   @Column({ nullable: true })
@@ -69,11 +85,17 @@ export class Event implements Node {
   @Column({ nullable: true })
   stateProv?: string;
 
-  @Column({ type: 'date', nullable: true })
-  dateStart?: string;
+  @Column({ nullable: true })
+  postalCode?: string;
+
+  @Column({ nullable: true })
+  timezone?: string;
 
   @Column({ type: 'date', nullable: true })
-  dateEnd?: string;
+  dateStart?: Date;
+
+  @Column({ type: 'date', nullable: true })
+  dateEnd?: Date;
 
   @Column({ enum: EventType, nullable: true })
   type?: EventType;
@@ -93,7 +115,10 @@ export class Event implements Node {
   @OneToMany(type => Award, award => award.event)
   awards?: Award[];
 
-  seasonId?: string;
+  @Column({ enum: PlayoffType, nullable: true })
+  playoffType?: string;
+
+  divisions?: string[];
 
 }
 

@@ -85,13 +85,19 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
+"@types/graphql-iso-date@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@types/graphql-iso-date/-/graphql-iso-date-3.3.0.tgz#31ec2ddcbac146b4fe7e2afe459d589ee3363115"
+  dependencies:
+    "@types/graphql" "*"
+
+"@types/graphql@*", "@types/graphql@^0.13.0":
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.13.3.tgz#23af65796d341f93ef5b485138bd52c67786452d"
+
 "@types/graphql@0.12.6":
   version "0.12.6"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.12.6.tgz#3d619198585fcabe5f4e1adfb5cf5f3388c66c13"
-
-"@types/graphql@^0.13.0":
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.13.3.tgz#23af65796d341f93ef5b485138bd52c67786452d"
 
 "@types/handlebars@4.0.36":
   version "4.0.36"
@@ -1381,6 +1387,10 @@ graphql-import@^0.4.0:
   resolved "https://registry.yarnpkg.com/graphql-import/-/graphql-import-0.4.5.tgz#e2f18c28d335733f46df8e0733d8deb1c6e2a645"
   dependencies:
     lodash "^4.17.4"
+
+graphql-iso-date@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.5.0.tgz#55a1be0efa8d28c1453afd2eb5ce1d052189a513"
 
 graphql-playground-html@1.6.0:
   version "1.6.0"

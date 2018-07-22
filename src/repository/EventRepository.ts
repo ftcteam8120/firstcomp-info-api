@@ -4,6 +4,8 @@ import { Event, EventFilter, EventOrder } from '../entity/Event';
 import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { DataMerge } from '../util/DataMerge';
+import { Program } from '../entity/Team';
+import TheBlueAlliance from '../service/TheBlueAlliance';
 
 @Service()
 export class EventRepository {
@@ -12,7 +14,8 @@ export class EventRepository {
     private entityManager: EntityManager,
     private firstSearch: FIRSTSearch,
     private idGenerator: IDGenerator,
-    private dataMerge: DataMerge
+    private dataMerge: DataMerge,
+    private theBlueAlliance: TheBlueAlliance
   ) { }
 
   /**
@@ -22,6 +25,7 @@ export class EventRepository {
   public async findById(id: string): Promise<Event> {
     const decoded = this.idGenerator.decodeEvent(id);
     return this.dataMerge.mergeOne<Event>(
+      await this.theBlueAlliance.findEvent(id),
       await this.firstSearch.findEvent(id),
       await this.entityManager.findOne(Event, decoded)
     );

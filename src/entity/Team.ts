@@ -31,7 +31,7 @@ export class Team implements Node {
   name?: string;
 
   @Column({ nullable: true })
-  schoolName?: string;
+  sponsors?: string;
 
   @Column({ nullable: true })
   city?: string;
@@ -74,12 +74,8 @@ export enum TeamOrder {
   program_DESC = 'program_DESC',
   number_ASC = 'number_ASC',
   number_DESC = 'number_DESC',
-  nameFull_ASC  = 'nameFull_ASC',
-  nameFull_DESC  = 'nameFull_DESC',
-  nameShort_ASC = 'nameShort_ASC',
-  nameShort_DESC = 'nameShort_DESC',
-  schoolName_ASC = 'nameShort_DESC',
-  schoolName_DESC = 'nameShort_DESC',
+  name_ASC  = 'name_ASC',
+  name_DESC  = 'name_DESC',
   city_ASC = 'city_ASC',
   city_DESC = 'city_DESC',
   stateProv_ASC = 'stateProv_ASC',

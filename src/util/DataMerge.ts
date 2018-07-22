@@ -11,12 +11,15 @@ export class DataMerge {
     private entityManager: EntityManager
   ) { }
 
-  public mergeOne<T extends Node>(firstData: T, localData: T): T {
-    if (firstData === null && localData === undefined) return null;
+  public mergeOne<T extends Node>(...data: T[]): T {
+    let nulls = 0;
+    for (const d of data) {
+      if (!d) nulls += 1;
+    }
+    if (nulls === data.length) return null; 
     return _.mergeWith(
       {},
-      firstData,
-      localData,
+      ...data,
       (a, b) => b === null ? a : undefined
     );
   }

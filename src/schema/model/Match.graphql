@@ -1,20 +1,33 @@
+enum MatchLevel {
+  EF
+  QM
+  QF
+  SF
+  F
+}
+
 type Match implements Node {
   id: ID!
   number: Int
+  setNumber: Int
   event: Event
-  actualStartTime: String
+  level: MatchLevel
+  actualStartTime: Time
   description: String
-  postResultTime: String
+  postResultTime: Time
   scoreRedTeleop: Int
   scoreRedFoul: Int
   scoreRedAuto: Int
   scoreRedAutoBonus: Int
   scoreRedEnd: Int
+  scoreRedTotal: Int
   scoreBlueTeleop: Int
   scoreBlueFoul: Int
   scoreBlueAuto: Int
   scoreBlueAutoBonus: Int
   scoreBlueEnd: Int
+  scoreBlueTotal: Int
+  winner: Side
   details: String
   teams: [MatchTeam]
 }

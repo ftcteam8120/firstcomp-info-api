@@ -1,6 +1,11 @@
 import { bootstrap, Action } from 'vesper';
 import * as dotenv from 'dotenv';
 import { CurrentUser } from './auth/CurrentUser';
+import {
+  GraphQLDate,
+  GraphQLTime,
+  GraphQLDateTime
+} from 'graphql-iso-date';
 
 // Use the .env file if not in production
 if (process.env.NODE_ENV !== 'prod') {
@@ -11,9 +16,8 @@ if (process.env.NODE_ENV !== 'prod') {
 const REDIS_URL = process.env.REDIS_URL;
 const PORT = parseInt(process.env.PORT, 2) || 3000;
 export const JWT_SECRET = process.env.JWT_SECRET;
-export const FRC_API_USER = process.env.FRC_API_USER;
-export const FRC_API_KEY = process.env.FRC_API_KEY;
-export const FRC_API_URL = process.env.FRC_API_URL;
+export const TBA_KEY = process.env.TBA_KEY;
+export const TBA_URL = process.env.TBA_URL;
 
 import { RedisCache } from './util/RedisCache';
 
@@ -51,6 +55,8 @@ import { MatchResolver } from './resolver/MatchResolver';
 import { MatchTeamResolver } from './resolver/MatchTeamResolver';
 import { AllianceResolver } from './resolver/AllianceResolver';
 import { AwardResolver } from './resolver/AwardResolver';
+import { AwardRecipient } from './entity/AwardRecipient';
+import { AwardRecipientResolver } from './resolver/AwardRecipientResolver';
 
 // Start vesper
 bootstrap({
@@ -72,6 +78,7 @@ bootstrap({
     MatchTeam,
     Alliance,
     Award,
+    AwardRecipient,
     Role
   ],
   resolvers: [
@@ -80,12 +87,16 @@ bootstrap({
     MatchResolver,
     MatchTeamResolver,
     AllianceResolver,
-    AwardResolver
+    AwardResolver,
+    AwardRecipientResolver
   ],
   customResolvers: {
     Node: {
       __resolveType: data => resolveType(data),
-    }
+    },
+    Date: GraphQLDate,
+    Time: GraphQLTime,
+    DateTime: GraphQLDateTime
   },
   playground: process.env.NODE_ENV !== 'prod',
   schemas: [__dirname + '/schema/**/*.graphql'],

@@ -7,10 +7,10 @@ export class Alliance {
 
   @PrimaryColumn({ type: 'varchar', name: 'eventCode' })
   @ManyToOne(type => Event, event => event.alliances)
-  event: Event | string;
+  event?: Event | string;
 
   @PrimaryColumn({ type: 'int', name: 'eventSeason' })
-  eventSeason: number;
+  eventSeason?: number;
 
   @PrimaryColumn()
   number: number;
@@ -19,16 +19,10 @@ export class Alliance {
   name: string;
 
   @Column({ nullable: true, type: 'int' })
-  captain?: Team | number;
+  captain: Team | number;
 
-  @Column({ nullable: true, type: 'int' })
-  round1: Team | number;
-
-  @Column({ nullable: true, type: 'int' })
-  round2: Team | number;
-
-  @Column({ nullable: true, type: 'int' })
-  round3: Team | number;
+  @Column({ array: true, nullable: true, type: 'int' })
+  picks: Team[] | number[];
 
   @Column({ nullable: true, type: 'int' })
   backup: Team | number;

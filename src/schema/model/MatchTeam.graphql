@@ -1,15 +1,11 @@
-enum Station {
-  Blue1
-  Blue2
-  Blue3
-  Red1
-  Red2
-  Red3
+enum Side {
+  BLUE
+  RED
 }
 
 type MatchTeam {
   team: Team
-  station: Station
+  side: Side
   dq: Boolean
   surrogate: Boolean
 }

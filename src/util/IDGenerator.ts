@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import { Program } from '../entity/Team';
 import * as validate from 'uuid-validate';
+import { MatchLevel } from '../entity/Match';
 
 @Service()
 export class IDGenerator {
@@ -37,17 +38,27 @@ export class IDGenerator {
     return this.btoa('Event-' + season.toString() + '-' + code);
   }
 
-  public match(number: number, eventId: string): string {
-    return this.btoa('Match-' + eventId + '-' + number.toString());
+  public match(number: number, setNumber: number, level: MatchLevel, eventId: string): string {
+    return this.btoa(
+      'Match-' + eventId + '-' + level + '-' + number.toString() + '-' + setNumber.toString()
+    );
   }
 
-  public decodeMatch(id: string): { number: number, eventSeason: number, eventCode: string } {
+  public decodeMatch(id: string): {
+    number: number,
+    setNumber: number,
+    level: MatchLevel,
+    eventSeason: number,
+    eventCode: string
+  } {
     const split: any[] = this.atob(id).split('-');
     if (split[0] !== 'Match') throw new Error('Invalid Match ID');
     return {
-      number: split[1] * 1,
-      eventSeason: this.decodeEvent(split[2]).season,
-      eventCode: this.decodeEvent(split[2]).code
+      number: split[2] * 1,
+      setNumber: split[3] * 1,
+      level: MatchLevel[split[1]] as MatchLevel,
+      eventSeason: this.decodeEvent(split[1]).season,
+      eventCode: this.decodeEvent(split[1]).code
     };
   }
 

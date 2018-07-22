@@ -17,26 +17,43 @@ enum EventType {
   CHAMPIONSHIP
   WORLD_FESTIVAL
   OFF_SEASON
+  FOC
   OFF_SEASON_WITH_AZURE_SYNC
   OFFICIAL_EXPO
   TRAINING_EDUCATION
   DISPLAY_DEMONSTRATION
 }
 
+enum PlayoffType {
+  BRACKET_8_TEAM
+  BRACKET_16_TEAM
+  BRACKET_4_TEAM
+  AVG_SCORE_8_TEAM
+  ROUND_ROBIN_6_TEAM
+  DOUBLE_ELIM_8_TEAM
+  BO5_FINALS
+  BO3_FINALS
+}
+
 type Event implements Node {
   id: ID!
   code: String!
+  divisions: [Event]
   address: String
   name: String!
   description: String
   season: Season
+  district: String
+  playoffType: PlayoffType
   venue: String
   city: String
   countryCode: String
   country: Country
+  timezone: String
   stateProv: String
-  dateStart: String
-  dateEnd: String
+  postalCode: String
+  dateStart: DateTime
+  dateEnd: DateTime
   type: EventType
   website: String
   program: Program

@@ -60,7 +60,7 @@ export class FIRSTSearch {
       number: data.team_number_yearly,
       program: data.team_type,
       name: data.team_nickname,
-      schoolName: data.team_name_calc,
+      sponsors: data.team_name_calc,
       city: data.team_city,
       stateProv: data.team_stateprov,
       countryCode: data.team_country,
@@ -76,7 +76,6 @@ export class FIRSTSearch {
     program: 'team_type',
     number: 'team_number_yearly',
     name: 'team_nickname',
-    schoolName: 'team_name_calc',
     city: 'team_city',
     stateProv: 'team_stateprov',
     countryCode: 'team_country',
@@ -98,13 +97,12 @@ export class FIRSTSearch {
       city: data.event_city,
       countryCode: data.event_country,
       stateProv: data.event_stateprov,
-      dateStart: data.date_start,
-      dateEnd: data.date_end,
+      dateStart: new Date(Date.parse(data.date_start)),
+      dateEnd: new Date(Date.parse(data.date_end)),
       type: this.convertEventType(data.event_subtype),
       website: data.event_web_url,
       program: data.event_type,
-      season: data.event_season,
-      seasonId: data.fk_program_seasons ? this.idGenerator.season(data.fk_program_seasons) : null
+      season: data.event_season
     };
   }
 
@@ -237,6 +235,8 @@ export class FIRSTSearch {
       return this.redisCache.set(event).then(() => {
         return event;
       });
+    }).catch(() => {
+      return null;
     });
   }
 
