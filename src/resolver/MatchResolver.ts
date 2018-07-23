@@ -5,12 +5,15 @@ import { FIRSTSearch } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { EntityManager } from 'typeorm';
 import { TheBlueAlliance } from '../service/TheBlueAlliance';
+import { EventRepository } from '../repository/EventRepository';
+import { Event } from '../entity/Event';
 
 @Resolver(Match)
 export class MatchResolver {
 
   constructor(
     private entityManager: EntityManager,
+    private eventRepository: EventRepository,
     private firstSearch: FIRSTSearch,
     private idGenerator: IDGenerator,
     private theBlueAllaince: TheBlueAlliance
@@ -40,6 +43,14 @@ export class MatchResolver {
     // Check if the match videos are already set
     if (match.videos === null) return this.theBlueAllaince.findMatchVideos(match);
     return match.videos;
+  }
+
+  @Resolve()
+  event(match: Match) {
+    return this.eventRepository.findByCode(
+      (match.event as Event).season,
+      (match.event as Event).code
+    );
   }
 
 }
