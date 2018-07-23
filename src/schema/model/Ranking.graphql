@@ -1,0 +1,9 @@
+type Ranking {
+  rank: Int
+  dq: Int
+  matchesPlayed: Int
+  losses: Int
+  wins: Int
+  ties: Int
+  team: Team
+}

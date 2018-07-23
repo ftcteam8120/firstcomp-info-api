@@ -46,6 +46,7 @@ import { MatchTeam } from './entity/MatchTeam';
 import { Alliance } from './entity/Alliance';
 import { Award } from './entity/Award';
 import { Role } from './entity/Role';
+import { Ranking } from './entity/Ranking';
 
 // Import resolvers
 import { resolveType } from './entity/Node';
@@ -57,6 +58,7 @@ import { AllianceResolver } from './resolver/AllianceResolver';
 import { AwardResolver } from './resolver/AwardResolver';
 import { AwardRecipient } from './entity/AwardRecipient';
 import { AwardRecipientResolver } from './resolver/AwardRecipientResolver';
+import { RankingResolver } from './resolver/RankingResolver';
 
 // Start vesper
 bootstrap({
@@ -79,7 +81,8 @@ bootstrap({
     Alliance,
     Award,
     AwardRecipient,
-    Role
+    Role,
+    Ranking
   ],
   resolvers: [
     TeamResolver,
@@ -88,7 +91,8 @@ bootstrap({
     MatchTeamResolver,
     AllianceResolver,
     AwardResolver,
-    AwardRecipientResolver
+    AwardRecipientResolver,
+    RankingResolver
   ],
   customResolvers: {
     Node: {

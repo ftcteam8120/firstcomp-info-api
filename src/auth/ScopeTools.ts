@@ -129,6 +129,21 @@ export const SCOPES: Scope[] = [
       'person',
       'name'
     ]
+  },
+  {
+    entity: 'ranking',
+    actions: [
+      ScopeAction.READ,
+      ScopeAction.WRITE
+    ],
+    fields: [
+      'rank',
+      'dq',
+      'matchesPlayed',
+      'losses',
+      'wins',
+      'team'
+    ]
   }
 ];
 

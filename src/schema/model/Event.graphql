@@ -61,6 +61,7 @@ type Event implements Node {
   alliances: [Alliance]
   awards: [Award]
   webcasts: [Webcast]
+  rankings: [Ranking]
 }
 
 type EventEdge {

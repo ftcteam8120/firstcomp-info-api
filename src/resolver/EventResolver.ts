@@ -8,6 +8,7 @@ import { EntityManager } from 'typeorm';
 import { Award } from '../entity/Award';
 import { Program } from '../entity/Team';
 import { TheBlueAlliance } from '../service/TheBlueAlliance';
+import { Ranking } from '../entity/Ranking';
 
 @Resolver(Event)
 export class EventResolver {
@@ -99,6 +100,25 @@ export class EventResolver {
         award.event = event;
       }
       return awards;
+    });
+  }
+
+  @Resolve()
+  @Authorized(['ranking:read'])
+  rankings(event: Event) {
+    if (event.program === Program.FRC) {
+      return this.theBlueAlliance.findRankings(event);
+    }
+    return this.entityManager.find(Ranking, {
+      event: event.code,
+      eventSeason: event.season
+    }).then((rankings: Ranking[]) => {
+      if (!rankings) return [];
+      // Add event data to all the awards
+      for (const ranking of rankings) {
+        ranking.event = event;
+      }
+      return rankings;
     });
   }
 

@@ -15,6 +15,7 @@ import { Media, MediaType } from '../entity/Media';
 import { SocialMedia, SocialMediaType } from '../entity/SocialMedia';
 import { Webcast, WebcastType } from '../entity/Webcast';
 import { Video, VideoType } from '../entity/Video';
+import { Ranking } from '../entity/Ranking';
 
 interface ScoreData {
   scoreRedTeleop?: number;
@@ -289,7 +290,6 @@ export class TheBlueAlliance  {
       'event/' + event.season + event.code.toLowerCase() +
       '/matches'
     ).then((rawMatches: any) => {
-      console.log(rawMatches);
       const matches: Match[] = [];
       for (const data of rawMatches) {
         matches.push(
@@ -445,6 +445,32 @@ export class TheBlueAlliance  {
         awards.push(this.convertAward(event, data));
       }
       return awards;
+    });
+  }
+
+  private convertRanking(event: Event, data: any): Ranking {
+    return {
+      event,
+      rank: data.rank,
+      dq: data.dq,
+      matchesPlayed: data.matches_played,
+      losses: data.record.losses,
+      wins: data.record.wins,
+      ties: data.record.ties,
+      team: data.team_key.substring(3) as any * 1
+    };
+  }
+
+  public async findRankings(event: Event): Promise<Ranking[]> {
+    return this.request(
+      'event/' + event.season + event.code.toLowerCase() +
+      '/rankings'
+    ).then((rawRankings: any) => {
+      const rankings: Ranking[] = [];
+      for (const data of rawRankings.rankings) {
+        rankings.push(this.convertRanking(event, data));
+      }
+      return rankings;
     });
   }
 
