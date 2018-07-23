@@ -90,3 +90,25 @@ export class Match implements Node {
   videos?: Video[];
 
 }
+
+export interface MatchFilter {
+  level: MatchLevel;
+  winner: Side;
+  number: number;
+  setNumber: number;
+}
+
+export enum MatchOrder {
+  number_ASC = 'number_ASC',
+  number_DESC = 'number_DESC',
+  setNumber_ASC = 'setNumber_ASC',
+  setNumber_DESC = 'setNumber_DESC',
+  level_ASC = 'level_ASC',
+  level_DESC = 'level_DESC',
+  scoreRedTotal_ASC = 'scoreRedTotal_ASC',
+  scoreRedTotal_DESC = 'scoreRedTotal_DESC',
+  scoreBlueTotal_ASC = 'scoreBlueTotal_ASC',
+  scoreBlueTotal_DESC = 'scoreBlueTotal_DESC',
+  winner_ASC = 'winner_ASC',
+  winner_DESC = 'winner_DESC'
+}

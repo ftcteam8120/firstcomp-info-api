@@ -1,4 +1,4 @@
-import { Resolver, Resolve } from 'vesper';
+import { Resolver, Resolve, Authorized } from 'vesper';
 import { Award } from '../entity/Award';
 import { Event } from '../entity/Event';
 import { AwardRecipient } from '../entity/AwardRecipient';
@@ -12,6 +12,7 @@ export class AwardRecipientResolver {
   ) { }
 
   @Resolve()
+  @Authorized(['team:read'])
   team(awardRecipient: AwardRecipient) {
     if (!awardRecipient.team) return null;
     return this.teamRepository.findByNumber(

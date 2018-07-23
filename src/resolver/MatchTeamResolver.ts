@@ -1,4 +1,4 @@
-import { Resolver, Resolve } from 'vesper';
+import { Resolver, Resolve, Authorized } from 'vesper';
 import { MatchTeam } from '../entity/MatchTeam';
 import { FIRSTSearch } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
@@ -18,6 +18,7 @@ export class MatchTeamResolver {
   ) {}
 
   @Resolve()
+  @Authorized(['team:read'])
   team(matchTeam: MatchTeam) {
     return this.teamRepository.findByNumber(
       ((matchTeam.match as Match).event as Event).program,

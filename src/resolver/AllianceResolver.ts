@@ -1,4 +1,4 @@
-import { Resolver, Resolve } from 'vesper';
+import { Resolver, Resolve, Authorized } from 'vesper';
 import { Alliance } from '../entity/Alliance';
 import { Event } from '../entity/Event';
 import { TeamRepository } from '../repository/TeamRepository';
@@ -12,6 +12,7 @@ export class AllianceResolver {
   ) { }
 
   @Resolve()
+  @Authorized(['team:read'])
   captain(alliance: Alliance) {
     if (!alliance.captain) return null;
     return this.teamRepository.findByNumber(
@@ -21,6 +22,7 @@ export class AllianceResolver {
   }
 
   @Resolve()
+  @Authorized(['team:read'])
   async picks(alliance: Alliance) {
     if (!alliance.picks) return [];
     const picks: Team[] = [];
@@ -36,6 +38,7 @@ export class AllianceResolver {
   }
 
   @Resolve()
+  @Authorized(['team:read'])
   backup(alliance: Alliance) {
     if (!alliance.backup) return null;
     return this.teamRepository.findByNumber(
@@ -45,6 +48,7 @@ export class AllianceResolver {
   }
 
   @Resolve()
+  @Authorized(['team:read'])
   backupReplaced(alliance: Alliance) {
     if (!alliance.backupReplaced) return null;
     return this.teamRepository.findByNumber(

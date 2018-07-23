@@ -636,7 +636,7 @@ export class TheBlueAlliance  {
           this.convertMatchLevel(rawMatch.comp_level),
           this.idGenerator.event(decoded.eventSeason, decoded.eventCode)
         ),
-        { code: decoded.eventCode, season: decoded.eventSeason } as any,
+        { code: decoded.eventCode, season: decoded.eventSeason, program: Program.FRC } as any,
         rawMatch
       );
       // Cache the videos

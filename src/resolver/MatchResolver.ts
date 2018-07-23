@@ -1,4 +1,4 @@
-import { Resolver, Resolve } from 'vesper';
+import { Resolver, Resolve, Authorized } from 'vesper';
 import { MatchTeam } from '../entity/MatchTeam';
 import { Match } from '../entity/Match';
 import { FIRSTSearch } from '../service/FIRSTSearch';
@@ -20,6 +20,7 @@ export class MatchResolver {
   ) {}
 
   @Resolve()
+  @Authorized(['team:read'])
   teams(match: Match) {
     // If the match teams are already filled, return them
     if (match.teams) {
@@ -39,6 +40,7 @@ export class MatchResolver {
   }
 
   @Resolve()
+  @Authorized(['video:read'])
   videos(match: Match) {
     // Check if the match videos are already set
     if (match.videos === null) return this.theBlueAllaince.findMatchVideos(match);
@@ -46,6 +48,7 @@ export class MatchResolver {
   }
 
   @Resolve()
+  @Authorized(['event:read'])
   event(match: Match) {
     return this.eventRepository.findByCode(
       (match.event as Event).season,

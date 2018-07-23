@@ -8,7 +8,11 @@ import { EntityManager } from 'typeorm';
 import { Award } from '../entity/Award';
 import { Program } from '../entity/Team';
 import { TheBlueAlliance } from '../service/TheBlueAlliance';
+import { MatchRepository } from '../repository/MatchRepository';
 import { Ranking } from '../entity/Ranking';
+import { Paginator } from '../util/Paginator';
+import * as _ from 'lodash';
+import { EventRepository } from '../repository/EventRepository';
 
 @Resolver(Event)
 export class EventResolver {
@@ -17,52 +21,55 @@ export class EventResolver {
     private entityManager: EntityManager,
     private firstSearch: FIRSTSearch,
     private idGenerator: IDGenerator,
-    private theBlueAlliance: TheBlueAlliance
+    private theBlueAlliance: TheBlueAlliance,
+    private paginator: Paginator,
+    private matchRepository: MatchRepository,
+    private eventRepository: EventRepository
   ) { }
   
   @Resolve()
-  async divisions(event: Event) {
+  @Authorized(['event:read'])
+  async divisions(event: Event, { first, after, filter, orderBy }) {
+    // Return an empty array if the event does not have divisions
     if (!event.divisions) return [];
-    const divisions: Event[] = [];
-    for (const id of event.divisions) {
-      divisions.push(await this.theBlueAlliance.findEvent(id));
-    }
-    return divisions;
+    // Pass the data into the paginator
+    return this.paginator.paginate(
+      await this.eventRepository.findDivisions(
+        event.divisions,
+        first,
+        after,
+        filter,
+        orderBy
+      ),
+      after
+    );
   }
 
   @Resolve()
+  @Authorized(['country:read'])
   country(event: Event) {
     return this.firstSearch.findCountry(this.idGenerator.country(event.countryCode));
   }
 
   @Resolve()
+  @Authorized(['season:read'])
   season(event: Event) {
     return this.firstSearch.findSeasonByYear(event.program, event.season);
   }
 
   @Resolve()
   @Authorized(['match:read'])
-  async matches(event: Event) {
-    if (event.program === Program.FRC) {
-      return this.theBlueAlliance.findMatches(event);
-    }
-    return this.entityManager.find(Match, {
-      event: event.code,
-      eventSeason: event.season
-    }).then((matches: Match[]) => {
-      if (!matches) return [];
-      // Add IDs and the event data to all the matches
-      for (const match of matches) {
-        match.id = this.idGenerator.match(
-          match.number,
-          match.setNumber,
-          match.level,
-          (match.event as Event).id
-        );
-        match.event = event;
-      }
-      return matches;
-    });
+  async matches(event: Event, { first, after, filter, orderBy }) {
+    return this.paginator.paginate(
+      await this.matchRepository.find(
+        event,
+        first,
+        after,
+        filter,
+        orderBy
+      ),
+      after
+    );
   }
 
   @Resolve()

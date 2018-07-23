@@ -4,148 +4,7 @@ import { Role } from '../entity/Role';
 import { RedisCache } from '../util/RedisCache';
 import * as _ from 'lodash';
 
-export enum ScopeAction {
-  READ = 'read',
-  WRITE = 'write',
-  ADMIN = 'admin'
-}
-
-export interface Scope {
-  entity: string;
-  actions: ScopeAction[];
-  fields: string[];
-}
-
-export const SCOPES: Scope[] = [
-  {
-    entity: 'event',
-    actions: [
-      ScopeAction.READ,
-      ScopeAction.WRITE,
-      ScopeAction.ADMIN
-    ],
-    fields: [
-      'address',
-      'name',
-      'description',
-      'venue',
-      'city',
-      'countryCode',
-      'stateProv',
-      'dateStart',
-      'dateEnd',
-      'type',
-      'website',
-      'matches',
-      'alliances',
-      'awards',
-      'year'
-    ]
-  },
-  {
-    entity: 'match',
-    actions: [
-      ScopeAction.READ,
-      ScopeAction.WRITE
-    ],
-    fields: [
-      'actualStartTime',
-      'description',
-      'postResultTime',
-      'scoreRedTeleop',
-      'scoreRedFoul',
-      'scoreRedAuto',
-      'scoreRedAutoBonus',
-      'scoreRedEnd',
-      'scoreBlueTeleop',
-      'scoreBlueFoul',
-      'scoreBlueAuto',
-      'scoreBlueAutoBonus',
-      'scoreBlueEnd',
-      'details',
-      'teams'
-    ]
-  },
-  {
-    entity: 'team',
-    actions: [
-      ScopeAction.READ,
-      ScopeAction.WRITE
-    ],
-    fields: [
-      'homeCmp',
-      'name',
-      'sponsors',
-      'city',
-      'stateProv',
-      'countryCode',
-      'rookieYear',
-      'robotName',
-      'districtCode',
-      'website',
-      'season',
-      'profileYear'
-    ]
-  },
-  {
-    entity: 'user',
-    actions: [
-      ScopeAction.READ,
-      ScopeAction.WRITE,
-      ScopeAction.ADMIN
-    ],
-    fields: [
-      'firstName',
-      'lastName',
-      'email',
-      'photoUrl',
-      'password'
-    ]
-  },
-  {
-    entity: 'alliance',
-    actions: [
-      ScopeAction.READ,
-      ScopeAction.WRITE
-    ],
-    fields: [
-      'name',
-      'captain',
-      'round1',
-      'round2',
-      'round3',
-      'backup',
-      'backupReplaced'
-    ]
-  },
-  {
-    entity: 'award',
-    actions: [
-      ScopeAction.READ,
-      ScopeAction.WRITE
-    ],
-    fields: [
-      'team',
-      'person',
-      'name'
-    ]
-  },
-  {
-    entity: 'ranking',
-    actions: [
-      ScopeAction.READ,
-      ScopeAction.WRITE
-    ],
-    fields: [
-      'rank',
-      'dq',
-      'matchesPlayed',
-      'losses',
-      'wins',
-      'team'
-    ]
-  }
-];
+import { ScopeAction, SCOPES, ROLES } from './Scopes';
 
 @Service()
 export class ScopeTools {
@@ -158,15 +17,16 @@ export class ScopeTools {
    * @memberof ScopeTools
    */
   public async findRole(name: string): Promise<Role> {
+    // Check if the role is locally defined
+    const local: Role = _.find(ROLES, { name });
+    if (local) return Promise.resolve(local);
     // Check for a cached value
     const cached: any = await Container.get(RedisCache).get('Role-' + name);
     if (cached) return cached;
     // Find the role in the DB
     return getManager().findOne(Role, { name }).then((role: Role) => {
-      // Set the ID of the role
-      role.id = 'Role-' + name;
       // Cache the role in Redis
-      return Container.get(RedisCache).set(role).then(() => {
+      return Container.get(RedisCache).setKey('Role-' + role.name, role).then(() => {
         return role;
       });
     });

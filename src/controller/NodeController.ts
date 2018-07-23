@@ -6,6 +6,7 @@ import { FIRSTSearch } from '../service/FIRSTSearch';
 import { EntityManager } from 'typeorm';
 import { User } from '../entity/User';
 import { CurrentUser } from '../auth/CurrentUser';
+import { MatchRepository } from '../repository/MatchRepository';
 
 class NodeAuthorizationChecker implements RoleCheckerInterface {
   public check(action: Action) {
@@ -45,6 +46,12 @@ class NodeAuthorizationChecker implements RoleCheckerInterface {
         }
         break;
       }
+      case 'Match': {
+        if (!currentUser.hasScope('match:read')) {
+          throw new Error('Missing required scopes match:read');
+        }
+        break;
+      }
       default: {
         throw new Error('Invalid ID format');
       }
@@ -59,6 +66,7 @@ export class NodeController {
     private entityManager: EntityManager,
     private eventRepository: EventRepository,
     private teamRepository: TeamRepository,
+    private matchRepository: MatchRepository,
     private idGenerator: IDGenerator,
     private firstSearch: FIRSTSearch
   ) { }
@@ -82,6 +90,9 @@ export class NodeController {
       }
       case 'Country': {
         return this.firstSearch.findCountry(id);
+      }
+      case 'Match': {
+        return this.matchRepository.findById(id);
       }
       default: {
         throw new Error('Invalid ID format');

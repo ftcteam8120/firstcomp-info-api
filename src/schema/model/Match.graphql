@@ -13,8 +13,8 @@ type Match implements Node {
   event: Event
   level: MatchLevel
   actualStartTime: Time
-  description: String
   postResultTime: Time
+  description: String
   scoreRedTeleop: Int
   scoreRedFoul: Int
   scoreRedAuto: Int
@@ -31,4 +31,37 @@ type Match implements Node {
   details: String
   teams: [MatchTeam]
   videos: [Video]
+}
+
+type MatchEdge {
+  cursor: String!
+  node: Match
+}
+
+type MatchConnection {
+  totalCount: Int!
+  edges: [MatchEdge]
+  pageInfo: PageInfo!
+}
+
+input MatchFilter {
+  level: MatchLevel
+  winner: Side
+  number: Int
+  setNumber: Int
+}
+
+enum MatchOrder {
+  number_ASC
+  number_DESC
+  setNumber_ASC
+  setNumber_DESC
+  level_ASC
+  level_DESC
+  scoreRedTotal_ASC
+  scoreRedTotal_DESC
+  scoreBlueTotal_ASC
+  scoreBlueTotal_DESC
+  winner_ASC
+  winner_DESC
 }

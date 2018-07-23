@@ -1,4 +1,4 @@
-import { Resolver, Resolve } from 'vesper';
+import { Resolver, Resolve, Authorized } from 'vesper';
 import { Award } from '../entity/Award';
 import { Event } from '../entity/Event';
 import { EntityManager } from 'typeorm';
@@ -12,6 +12,7 @@ export class AwardResolver {
   ) { }
 
   @Resolve()
+  @Authorized(['award_recipient:read'])
   recipients(award: Award) {
     if (award.recipients) return award.recipients;
     return this.entityManager.find(AwardRecipient, {

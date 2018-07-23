@@ -2,9 +2,7 @@ import { Entity, Column, PrimaryColumn, ManyToOne, JoinTable, OneToMany } from '
 import { Node } from './Node';
 
 @Entity()
-export class Role implements Node {
-
-  id: string;
+export class Role {
 
   @PrimaryColumn()
   name: string;

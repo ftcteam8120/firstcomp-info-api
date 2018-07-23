@@ -1,4 +1,4 @@
-import { Resolver, Resolve } from 'vesper';
+import { Resolver, Resolve, Authorized } from 'vesper';
 import { Ranking } from '../entity/Ranking';
 import { TeamRepository } from '../repository/TeamRepository';
 import { Event } from '../entity/Event';
@@ -11,6 +11,7 @@ export class RankingResolver {
   ) {}
 
   @Resolve()
+  @Authorized(['team:read'])
   team(ranking: Ranking) {
     return this.teamRepository.findByNumber(
       (ranking.event as Event).program,

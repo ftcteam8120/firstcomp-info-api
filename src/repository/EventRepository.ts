@@ -7,6 +7,7 @@ import { DataMerge } from '../util/DataMerge';
 import { Program } from '../entity/Team';
 import { TheBlueAlliance } from '../service/TheBlueAlliance';
 import { RedisCache } from '../util/RedisCache';
+import * as _ from 'lodash';
 
 @Service()
 export class EventRepository {
@@ -51,7 +52,7 @@ export class EventRepository {
   /**
    * Find all events
    * @param first How many events to find
-   * @param after A curstor to find events after
+   * @param after A cursor to find events after
    * @param filter An object containing filters
    * @param orderBy An array of EventOrder enums
    */
@@ -62,6 +63,59 @@ export class EventRepository {
       await this.firstSearch.findEvents(first, after, filter, orderBy),
       ['code']
     );
+  }
+
+  /**
+   * Find divisions for an event
+   * @param divisionIds The IDs of the divisions to find
+   * @param first How many divisions to find
+   * @param after A cursor to find divisions after
+   * @param filter An object containing filters
+   * @param orderBy An array of EventOrder enums
+   */
+  public async findDivisions(
+    divisionIds: string[],
+    first: number,
+    after?: string,
+    filter?: EventFilter,
+    orderBy?: EventOrder[]
+  ): Promise<FindResult<Event>> {
+    let divisions: Event[] = [];
+    // Decode the cursor
+    let from = 0;
+    if (after) from = this.idGenerator.decodeCursor(after).from + 1;
+    // Limit the count to how many were requested
+    let limit = divisionIds.length;
+    if (first < limit - from) {
+      limit = first;
+    }
+    // Query all of the divisions
+    for (let i = from; i < limit; i += 1) {
+      divisions.push(await this.theBlueAlliance.findEvent(divisionIds[i]));
+    }
+    if (filter) {
+      // Filter the objects first
+      divisions = _.filter(divisions, filter as any);
+    }
+    if (orderBy) {
+      // Get the orders from the orderBy arg
+      const orderFields: string[] = [];
+      const orders: string[] = [];
+      let split: string[];
+      for (const order of orderBy) {
+        split = (order as string).split('_');
+        orderFields.push(split[0]);
+        orders.push(split[1].toLowerCase());
+      }
+      // Order last
+      divisions = _.orderBy(divisions, orderFields, orders);
+    }
+    return {
+      totalCount: divisions.length,
+      hasNextPage: first < limit - from,
+      hasPreviousPage: from > 0,
+      data: divisions
+    };
   }
 
 }
