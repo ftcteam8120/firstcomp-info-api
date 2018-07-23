@@ -258,9 +258,15 @@ export class TheBlueAlliance  {
       postResultTime: new Date(data.post_result_time * 1000),
       details: data.score_breakdown,
       teams: [],
+      videos: null,
       winner: (data.winning_alliance === 'blue') ? Side.BLUE : Side.RED,
       ...this.convertScores(event.season, data)
     };
+    const videos: Video[] = [];
+    for (const video of data.videos) {
+      videos.push(this.convertMatchVideo(video));
+    }
+    if (videos.length > 0) match.videos = videos;
     const blueTeams = this.convertMatchTeams(
       match,
       Side.BLUE,
@@ -292,6 +298,7 @@ export class TheBlueAlliance  {
     ).then((rawMatches: any) => {
       const matches: Match[] = [];
       for (const data of rawMatches) {
+        console.log(data);
         matches.push(
           this.convertMatch(
             this.idGenerator.match(
@@ -610,7 +617,33 @@ export class TheBlueAlliance  {
           return videos;
         });
       }
-      return [];
+    });
+  }
+
+  public async findMatch(id: string): Promise<Match> {
+    const decoded = this.idGenerator.decodeMatch(id);
+    return this.request(
+      'match/' +
+      decoded.eventSeason.toString() +
+      decoded.eventCode.toLowerCase() + '_' +
+      decoded.level.toString().toLowerCase() +
+      (decoded.level !== MatchLevel.QM ? (decoded.setNumber.toString() + 'm') : '') +
+      decoded.number.toString()
+    ).then((rawMatch: any) => {
+      const match: Match = this.convertMatch(
+        this.idGenerator.match(
+          rawMatch.match_number,
+          rawMatch.set_number,
+          this.convertMatchLevel(rawMatch.comp_level),
+          this.idGenerator.event(decoded.eventSeason, decoded.eventCode)
+        ),
+        { code: decoded.eventCode, season: decoded.eventSeason } as any,
+        rawMatch
+      );
+      // Cache the videos
+      return this.redisCache.setKey(match.id + '-videos', match.videos).then(() => {
+        return match;
+      });
     });
   }
 

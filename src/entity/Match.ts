@@ -87,4 +87,6 @@ export class Match implements Node {
   @OneToMany(type => MatchTeam, matchTeam => matchTeam.match)
   teams: MatchTeam[];
 
+  videos?: Video[];
+
 }

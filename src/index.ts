@@ -36,6 +36,7 @@ import { NodeController } from './controller/NodeController';
 import { SeasonController } from './controller/SeasonController';
 import { CountryController } from './controller/CountryController';
 import { AuthController } from './controller/AuthController';
+import { MatchController } from './controller/MatchController';
 
 // Import entities
 import { User } from './entity/User';
@@ -70,7 +71,8 @@ bootstrap({
     EventController,
     SeasonController,
     CountryController,
-    AuthController
+    AuthController,
+    MatchController
   ],
   entities: [
     User,

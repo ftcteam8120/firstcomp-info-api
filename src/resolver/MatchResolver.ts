@@ -37,7 +37,9 @@ export class MatchResolver {
 
   @Resolve()
   videos(match: Match) {
-    return this.theBlueAllaince.findMatchVideos(match);
+    // Check if the match videos are already set
+    if (match.videos === null) return this.theBlueAllaince.findMatchVideos(match);
+    return match.videos;
   }
 
 }

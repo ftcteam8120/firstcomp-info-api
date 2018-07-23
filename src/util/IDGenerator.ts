@@ -54,9 +54,9 @@ export class IDGenerator {
     const split: any[] = this.atob(id).split('-');
     if (split[0] !== 'Match') throw new Error('Invalid Match ID');
     return {
-      number: split[2] * 1,
-      setNumber: split[3] * 1,
-      level: MatchLevel[split[1]] as MatchLevel,
+      number: split[3] * 1,
+      setNumber: split[4] * 1,
+      level: MatchLevel[split[2]] as MatchLevel,
       eventSeason: this.decodeEvent(split[1]).season,
       eventCode: this.decodeEvent(split[1]).code
     };
