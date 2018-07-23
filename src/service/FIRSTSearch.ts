@@ -84,6 +84,11 @@ export class FIRSTSearch {
     profileYear: 'profile_year'
   };
 
+  private convertEventDate(data: string): string {
+    const tSplit: string[] = data.split('T');
+    return tSplit[0];
+  }
+
   private convertEvent(id: string, data: any): Event {
     return {
       id,
@@ -97,8 +102,8 @@ export class FIRSTSearch {
       city: data.event_city,
       countryCode: data.event_country,
       stateProv: data.event_stateprov,
-      dateStart: new Date(Date.parse(data.date_start)),
-      dateEnd: new Date(Date.parse(data.date_end)),
+      dateStart: this.convertEventDate(data.date_start),
+      dateEnd: this.convertEventDate(data.date_end),
       type: this.convertEventType(data.event_subtype),
       website: data.event_web_url,
       program: data.event_type,

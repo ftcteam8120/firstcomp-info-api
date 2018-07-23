@@ -30,4 +30,5 @@ type Match implements Node {
   winner: Side
   details: String
   teams: [MatchTeam]
+  videos: [Video]
 }

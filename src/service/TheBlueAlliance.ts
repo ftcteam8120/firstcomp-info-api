@@ -13,6 +13,8 @@ import { AwardRecipient } from '../entity/AwardRecipient';
 import { Robot } from '../entity/Robot';
 import { Media, MediaType } from '../entity/Media';
 import { SocialMedia, SocialMediaType } from '../entity/SocialMedia';
+import { Webcast, WebcastType } from '../entity/Webcast';
+import { Video, VideoType } from '../entity/Video';
 
 interface ScoreData {
   scoreRedTeleop?: number;
@@ -45,8 +47,33 @@ export class TheBlueAlliance  {
     }).then(res => res.json());
   }
 
-  private convertEvent(id: string, data: any): Event {
+  private convertWebcast(data: any): Webcast {
     return {
+      type: this.convertWebcastType(data.type),
+      data: data.channel,
+      file: data.file
+    };
+  }
+
+  private convertWebcastType(type: string): WebcastType {
+    switch (type) {
+      case 'youtube': return WebcastType.YOUTUBE;
+      case 'twitch': return WebcastType.TWITCH;
+      case 'ustream': return WebcastType.USTREAM;
+      case 'iframe': return WebcastType.IFRAME;
+      case 'html5': return WebcastType.HTML5;
+      case 'rtmp': return WebcastType.RTMP;
+      case 'livestream': return WebcastType.LIVESTREAM;
+    }
+  }
+
+  private convertEventDate(data: string): Date {
+    const split: string[] = data.split('-');
+    return new Date(split[0] as any * 1, split[1] as any * 1, split[2] as any * 1);
+  }
+
+  private convertEvent(id: string, data: any): Event {
+    const event: Event = {
       id,
       code: (data.event_code as string).toUpperCase(),
       name: data.name,
@@ -54,8 +81,8 @@ export class TheBlueAlliance  {
       playoffType: this.convertPlayoffType(data.playoff_type),
       address: data.address,
       venue: data.location_name,
-      dateStart: new Date(Date.parse(data.start_date)),
-      dateEnd: new Date(Date.parse(data.end_date)),
+      dateStart: data.start_date,
+      dateEnd: data.end_date,
       city: data.city,
       countryCode: data.country,
       stateProv: data.state_prov,
@@ -63,8 +90,15 @@ export class TheBlueAlliance  {
       type: this.convertEventType(data.event_type),
       website: data.website,
       program: Program.FRC,
+      webcasts: [],
       season: data.year
     };
+    const webcasts: Webcast[] = [];
+    for (const webcast of data.webcasts) {
+      webcasts.push(this.convertWebcast(webcast));
+    }
+    event.webcasts = webcasts;
+    return event;
   }
 
   private convertPlayoffType(type: number): PlayoffType {
@@ -113,6 +147,7 @@ export class TheBlueAlliance  {
     return this.request(
       'event/' + eventData.season + eventData.code.toLowerCase()
     ).then((rawEvent: any) => {
+      if (rawEvent.Errors) return null;
       return this.convertEvent(
         this.idGenerator.event(rawEvent.year, (rawEvent.event_code as string).toUpperCase()),
         rawEvent
@@ -197,6 +232,20 @@ export class TheBlueAlliance  {
     }
   }
 
+  private convertMatchVideoType(type: string): VideoType {
+    switch (type) {
+      case 'tba': return VideoType.TBA;
+      case 'youtube': return VideoType.YOUTUBE;
+    }
+  }
+
+  private convertMatchVideo(data: any): Video {
+    return {
+      type: this.convertMatchVideoType(data.type),
+      key: data.key
+    };
+  }
+
   private convertMatch(id: string, event: Event, data: any): Match {
     const match: Match = {
       id,
@@ -240,6 +289,7 @@ export class TheBlueAlliance  {
       'event/' + event.season + event.code.toLowerCase() +
       '/matches'
     ).then((rawMatches: any) => {
+      console.log(rawMatches);
       const matches: Match[] = [];
       for (const data of rawMatches) {
         matches.push(
@@ -509,6 +559,32 @@ export class TheBlueAlliance  {
         media.push(this.convertSocialMedia(data));
       }
       return media;
+    });
+  }
+
+  public async findMatchVideos(match: Match): Promise<Video[]> {
+    // Check for cached videos
+    const cached = await this.redisCache.get<Video[]>(match.id + '-videos');
+    if (cached) return cached;
+    return this.request(
+      'match/' +
+      (match.event as Event).season.toString() +
+      (match.event as Event).code.toLowerCase() + '_' +
+      match.level.toString().toLowerCase() +
+      (match.level !== MatchLevel.QM ? (match.setNumber.toString() + 'm') : '') +
+      match.number.toString()
+    ).then((rawMatch: any) => {
+      const videos: Video[] = [];
+      if (rawMatch.videos) {
+        for (const data of rawMatch.videos) {
+          videos.push(this.convertMatchVideo(data));
+        }
+        // Cache the videos
+        return this.redisCache.setKey(match.id + '-videos', videos).then(() => {
+          return videos;
+        });
+      }
+      return [];
     });
   }
 

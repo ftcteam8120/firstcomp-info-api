@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryColumn, ManyToOne, JoinTable, OneToMany } from '
 import { Event } from './Event';
 import { MatchTeam, Side } from './MatchTeam';
 import { Node } from './Node';
+import { Video } from './Video';
 
 export enum MatchLevel {
   EF = 'EF',

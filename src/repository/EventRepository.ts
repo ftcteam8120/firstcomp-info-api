@@ -35,7 +35,7 @@ export class EventRepository {
       await this.entityManager.findOne(Event, decoded)
     );
     // Cache the event
-    await this.redisCache.set(event);
+    if (event) await this.redisCache.set(event);
     return event;
   }
   

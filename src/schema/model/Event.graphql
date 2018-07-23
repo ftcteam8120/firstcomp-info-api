@@ -60,6 +60,7 @@ type Event implements Node {
   matches: [Match]
   alliances: [Alliance]
   awards: [Award]
+  webcasts: [Webcast]
 }
 
 type EventEdge {

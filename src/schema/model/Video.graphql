@@ -1,0 +1,9 @@
+enum VideoType {
+  YOUTUBE
+  TBA
+}
+
+type Video {
+  type: VideoType
+  key: String
+}

@@ -34,7 +34,7 @@ export class TeamRepository {
       })
     );
     // Cache the team
-    await this.redisCache.set(team);
+    if (team) await this.redisCache.set(team);
     return team;
   }
   

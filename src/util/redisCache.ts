@@ -36,7 +36,7 @@ export class RedisCache {
    */
   public async setKey(
     key: string,
-    value: Node,
+    value: any,
     expire: number = 3600
   ) {
     const val = JSON.stringify(value);

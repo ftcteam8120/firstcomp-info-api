@@ -4,6 +4,7 @@ import { Match } from '../entity/Match';
 import { FIRSTSearch } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { EntityManager } from 'typeorm';
+import { TheBlueAlliance } from '../service/TheBlueAlliance';
 
 @Resolver(Match)
 export class MatchResolver {
@@ -11,7 +12,8 @@ export class MatchResolver {
   constructor(
     private entityManager: EntityManager,
     private firstSearch: FIRSTSearch,
-    private idGenerator: IDGenerator
+    private idGenerator: IDGenerator,
+    private theBlueAllaince: TheBlueAlliance
   ) {}
 
   @Resolve()
@@ -31,6 +33,11 @@ export class MatchResolver {
       }
       return matchTeams;
     });
+  }
+
+  @Resolve()
+  videos(match: Match) {
+    return this.theBlueAllaince.findMatchVideos(match);
   }
 
 }

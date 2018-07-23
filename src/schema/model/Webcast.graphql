@@ -1,0 +1,15 @@
+enum WebcastType {
+  YOUTUBE
+  TWITCH
+  USTREAM
+  IFRAME
+  HTML5
+  RTMP
+  LIVESTREAM
+}
+
+type Webcast {
+  type: WebcastType
+  data: String
+  file: String
+}
