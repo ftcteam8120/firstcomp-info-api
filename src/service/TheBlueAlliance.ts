@@ -298,7 +298,6 @@ export class TheBlueAlliance  {
     ).then((rawMatches: any) => {
       const matches: Match[] = [];
       for (const data of rawMatches) {
-        console.log(data);
         matches.push(
           this.convertMatch(
             this.idGenerator.match(
