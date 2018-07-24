@@ -56,9 +56,11 @@ export class Team implements Node {
 }
 
 export interface TeamFilter {
-  program?: Program;
-  season?: string;
-  profileYear?: number;
+  program?: Program[];
+  season?: string[];
+  profileYear?: number[];
+  countryCode?: string[];
+  country?: string[];
 }
 
 export enum TeamOrder {

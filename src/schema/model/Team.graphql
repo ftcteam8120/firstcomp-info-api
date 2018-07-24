@@ -42,9 +42,11 @@ type TeamConnection {
 }
 
 input TeamFilter {
-  program: Program
-  season: ID
-  profileYear: Int
+  program: [Program]
+  season: [ID]
+  profileYear: [Int]
+  countryCode: [String]
+  country: [ID]
 }
 
 enum TeamOrder {

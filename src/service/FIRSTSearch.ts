@@ -231,6 +231,38 @@ export class FIRSTSearch {
     });
   }
 
+  private buildTeamQuery(filter: TeamFilter): any {
+    const must = [];
+    if (filter.profileYear) {
+      must.push(this.elasticSearch.makeBool('profile_year', filter.profileYear));
+    }
+    if (filter.season) {
+      const seasonIds: number[] = [];
+      for (const season of filter.season) {
+        seasonIds.push(this.idGenerator.decodeSeason(season).internalId);
+      }
+      must.push(this.elasticSearch.makeBool('fk_program_seasons', seasonIds));
+    }
+    if (filter.program) {
+      must.push(this.elasticSearch.makeBool('team_type', filter.program));
+    }
+    if (filter.countryCode) {
+      must.push(this.elasticSearch.makeBool('team_country', filter.countryCode));
+    }
+    if (filter.country) {
+      const countryCodes: string[] = [];
+      for (const country of filter.country) {
+        countryCodes.push(this.idGenerator.decodeCountry(country).code);
+      }
+      must.push(this.elasticSearch.makeBool('team_country', countryCodes));
+    }
+    return {
+      bool: {
+        must
+      }
+    };
+  }
+
   /**
    * Find all teams
    * @param first How many teams to fetch
@@ -244,18 +276,11 @@ export class FIRSTSearch {
     filter: TeamFilter = {},
     orderBy: TeamOrder[] = []
   ): Promise<FindResult<Team>> {
-    const seasonId = filter.season ?
-      this.idGenerator.decodeSeason(filter.season).internalId :
-      undefined;
     return this.elasticSearch.query('https://es01.usfirst.org/teams/_search', {
       size: first + 1,
       from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
       sort: this.elasticSearch.buildSort(this.teamOrderDict, orderBy ? orderBy : []),
-      query: this.elasticSearch.buildQuery({
-        team_type: filter.program,
-        fk_program_seasons: seasonId,
-        profile_year: filter.profileYear
-      })
+      query: this.buildTeamQuery(filter)
     }).then((result: ElasticResult) => {
       const converted = this.convertAll(result, first, after, (nodeRaw) => {
         return this.convertTeam(
@@ -542,6 +567,65 @@ export class FIRSTSearch {
         );
       });
       // Cache all events
+      const cachePromises = [];
+      for (const node of converted.data) {
+        cachePromises.push(this.redisCache.set(node));
+      }
+      return Promise.all(cachePromises).then(() => {
+        return converted;
+      });
+    });
+  }
+
+  public teamSearch(
+    query: string,
+    first: number,
+    after?: string,
+    filter: TeamFilter = {},
+    orderBy: TeamOrder[] = []
+  ): Promise<FindResult<Team>> {
+    const q = this.buildTeamQuery(filter);
+    // Add the search terms
+    q.bool.must.push({
+      bool: {
+        should: [
+          {
+            fuzzy: {
+              team_nickname: query
+            }
+          }, {
+            match: {
+              team_nickname: query
+            }
+          }, {
+            match: {
+              team_city: query
+            }
+          }, {
+            match: {
+              team_country: query
+            }
+          }, {
+            match: {
+              team_stateprov: query
+            }
+          }
+        ]
+      }
+    });
+    return this.elasticSearch.query('https://es01.usfirst.org/teams/_search', {
+      size: first + 1,
+      from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
+      sort: this.elasticSearch.buildSort(this.eventOrderDict, orderBy ? orderBy : []),
+      query: q
+    }).then((result: ElasticResult) => {
+      const converted = this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertTeam(
+          this.idGenerator.team(nodeRaw.team_type, nodeRaw.team_number_yearly),
+          nodeRaw
+        );
+      });
+      // Cache all teams
       const cachePromises = [];
       for (const node of converted.data) {
         cachePromises.push(this.redisCache.set(node));

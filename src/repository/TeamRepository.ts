@@ -63,4 +63,26 @@ export class TeamRepository {
     );
   }
 
+  /**
+   * Query all teams
+   * @param query A query string
+   * @param first How many teams to find
+   * @param after A cursor to find teams after
+   * @param filter An object containing filters
+   * @param orderBy An array of TeamOrder enums
+   */
+  public async query(
+    query: string,
+    first: number,
+    after?: string,
+    filter?: TeamFilter,
+    orderBy?: TeamOrder[]
+  ): Promise<FindResult<Team>> {
+    return this.dataMerge.mergeMany<Team>(
+      Team,
+      await this.firstSearch.teamSearch(query, first, after, filter, orderBy),
+      ['code']
+    );
+
+  }
 }

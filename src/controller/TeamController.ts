@@ -32,4 +32,13 @@ export class TeamController {
     );
   }
 
+  @Query()
+  @Authorized(['event:read'])
+  async teamSearch({ query, first, after, filter, orderBy }) {
+    return this.paginator.paginate(
+      await this.teamRepository.query(query, first || 10, after, filter, orderBy),
+      after
+    );
+  }
+
 }
