@@ -299,5 +299,9 @@ export const ROLES: Role[] = [
   {
     name: 'guest',
     scopes: getAllScopes(ScopeAction.READ)
+  },
+  {
+    name: 'user',
+    scopes: getAllScopes(ScopeAction.READ)
   }
 ];

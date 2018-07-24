@@ -1,6 +1,7 @@
 import { User } from '../entity/User';
-import { Container } from '../../node_modules/typedi';
-import { Scope, ScopeTools, SCOPES } from './ScopeTools';
+import { Container } from 'typedi';
+import { ScopeTools } from './ScopeTools';
+import { Scope, SCOPES } from './Scopes';
 import * as _ from 'lodash';
 
 export class CurrentUser {
@@ -15,8 +16,10 @@ export class CurrentUser {
       this.profile = user;
     }
     this.scopes = [];
-    for (const scope of scopes) {
-      this.scopes.push(Container.get(ScopeTools).splitScope(scope));
+    if (scopes) {
+      for (const scope of scopes) {
+        this.scopes.push(Container.get(ScopeTools).splitScope(scope));
+      }
     }
   }
 

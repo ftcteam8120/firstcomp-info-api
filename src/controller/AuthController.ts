@@ -4,6 +4,8 @@ import { User } from '../entity/User';
 import * as bcrypt from 'bcrypt';
 import { JWT } from '../auth/JWT';
 import { ScopeTools } from '../auth/ScopeTools';
+import { Container } from 'typedi';
+import { CurrentUser } from '../auth/CurrentUser';
 
 @Controller()
 export class AuthController {
@@ -28,6 +30,16 @@ export class AuthController {
         return this.jwt.createToken(user.id, userRole.scopes, (60 * 60 * 24 * 7));
       });
     });
+  }
+
+  @Query()
+  authState(args, context) {
+    // Get the current user from the context
+    const currentUser: CurrentUser = context.container.get(CurrentUser);
+    return {
+      isLoggedIn: currentUser.id !== undefined,
+      user: currentUser.profile
+    };
   }
 
 }
