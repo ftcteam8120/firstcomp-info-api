@@ -274,6 +274,41 @@ export class FIRSTSearch {
     });
   }
 
+  private buildEventQuery(filter: EventFilter): any {
+    const must = [];
+    if (filter.year) {
+      must.push(this.elasticSearch.makeBool('event_season', filter.year));
+    }
+    if (filter.season) {
+      const seasonIds: number[] = [];
+      for (const season of filter.season) {
+        seasonIds.push(this.idGenerator.decodeSeason(season).internalId);
+      }
+      must.push(this.elasticSearch.makeBool('fk_program_seasons', seasonIds));
+    }
+    if (filter.program) {
+      must.push(this.elasticSearch.makeBool('event_type', filter.program));
+    }
+    if (filter.countryCode) {
+      must.push(this.elasticSearch.makeBool('event_country', filter.countryCode));
+    }
+    if (filter.country) {
+      const countryCodes: string[] = [];
+      for (const country of filter.country) {
+        countryCodes.push(this.idGenerator.decodeCountry(country).code);
+      }
+      must.push(this.elasticSearch.makeBool('event_country', countryCodes));
+    }
+    if (filter.stateProv) {
+      must.push(this.elasticSearch.makeBool('event_stateprov', filter.stateProv));
+    }
+    return {
+      bool: {
+        must
+      }
+    };
+  }
+
   /**
    * Find all events
    * @param first How many events to fetch
@@ -291,9 +326,7 @@ export class FIRSTSearch {
       size: first + 1,
       from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
       sort: this.elasticSearch.buildSort(this.eventOrderDict, orderBy ? orderBy : []),
-      query: this.elasticSearch.buildQuery(filter ? {
-        event_type: filter.program
-      } : {})
+      query: this.buildEventQuery(filter)
     }).then((result: ElasticResult) => {
       const converted = this.convertAll(result, first, after, (nodeRaw) => {
         return this.convertEvent(
@@ -431,6 +464,84 @@ export class FIRSTSearch {
         );
       });
       // Cache all countries
+      const cachePromises = [];
+      for (const node of converted.data) {
+        cachePromises.push(this.redisCache.set(node));
+      }
+      return Promise.all(cachePromises).then(() => {
+        return converted;
+      });
+    });
+  }
+
+  public eventSearch(
+    query: string,
+    first: number,
+    after?: string,
+    filter: EventFilter = {},
+    orderBy: EventOrder[] = []
+  ): Promise<FindResult<Event>> {
+    const q = this.buildEventQuery(filter);
+    // Add the search terms
+    q.bool.must.push({
+      bool: {
+        should: [
+          {
+            match: {
+              event_name: query
+            }
+          }, {
+            match: {
+              event_code: query
+            }
+          }, {
+            match: {
+              event_venue: query
+            }
+          }, {
+            match: {
+              event_city: query
+            }
+          }, {
+            match: {
+              event_stateprov: query
+            }
+          }, {
+            match: {
+              event_country: query
+            }
+          }, {
+            match: {
+              event_city: query
+            }
+          }, {
+            match: {
+              event_stateprov: query
+            }
+          }, {
+            match: {
+              event_country: query
+            }
+          }
+        ]
+      }
+    });
+    return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
+      size: first + 1,
+      from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
+      sort: this.elasticSearch.buildSort(this.eventOrderDict, orderBy ? orderBy : []),
+      query: q
+    }).then((result: ElasticResult) => {
+      const converted = this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertEvent(
+          this.idGenerator.event(
+            nodeRaw.event_season,
+            nodeRaw.event_code
+          ),
+          nodeRaw
+        );
+      });
+      // Cache all events
       const cachePromises = [];
       for (const node of converted.data) {
         cachePromises.push(this.redisCache.set(node));

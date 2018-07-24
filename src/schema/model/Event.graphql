@@ -76,7 +76,12 @@ type EventConnection {
 }
 
 input EventFilter {
-  program: Program
+  program: [Program]
+  season: [ID]
+  year: [Int]
+  country: [ID]
+  countryCode: [String]
+  stateProv: [String]
 }
 
 enum EventOrder {

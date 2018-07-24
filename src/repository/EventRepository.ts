@@ -66,6 +66,28 @@ export class EventRepository {
   }
 
   /**
+   * Query all events
+   * @param query A query string
+   * @param first How many events to find
+   * @param after A cursor to find events after
+   * @param filter An object containing filters
+   * @param orderBy An array of EventOrder enums
+   */
+  public async query(
+    query: string,
+    first: number,
+    after?: string,
+    filter?: EventFilter,
+    orderBy?: EventOrder[]
+  ): Promise<FindResult<Event>> {
+    return this.dataMerge.mergeMany<Event>(
+      Event,
+      await this.firstSearch.eventSearch(query, first, after, filter, orderBy),
+      ['code']
+    );
+  }
+
+  /**
    * Find divisions for an event
    * @param divisionIds The IDs of the divisions to find
    * @param first How many divisions to find

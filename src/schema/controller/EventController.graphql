@@ -3,4 +3,5 @@ type Query {
   eventByCode(seasonId: ID!, code: String!): Event
   eventByYearCode(year: Int!, code: String!): Event
   events(first: Int, after: String, filter: EventFilter, orderBy: [EventOrder]): EventConnection
+  eventSearch(query: String, first: Int, after: String, filter: EventFilter, orderBy: [EventOrder]): EventConnection
 }

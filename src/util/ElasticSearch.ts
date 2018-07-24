@@ -70,29 +70,47 @@ export class ElasticSearch {
       });
   }
 
+  public makeMatch(field: string, value: any): any {
+    return {
+      match: {
+        [field]: value
+      }
+    };
+  }
+
+  public makeBool(field: string, value: any | any[]): any {
+    const should = [];
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        should.push(this.makeMatch(field, item));
+      }
+    } else {
+      should.push(this.makeMatch(field, value));
+    }
+    return {
+      bool: {
+        should: [
+          should
+        ]
+      }
+    };
+  }
+
   public buildQuery(values: any): any {
-    let string = '';
-    let count = 0;
+    const must = [];
     if (values) {
       if (Object.keys(values).length > 0) {
         for (let i = 0; i < Object.keys(values).length; i += 1) {
           // Prevent undefined and null values
           if (values[Object.keys(values)[i]]) {
-            string += Object.keys(values)[i] + ': ' + values[Object.keys(values)[i]];
-            count += 1;
-          }
-          // Join values with AND statement
-          if (i !== Object.keys(values).length - 1 && values[Object.keys(values)[i + 1]]) {
-            string += ' AND ';
+            must.push(this.makeBool(Object.keys(values)[i], values[Object.keys(values)[i]]));
           }
         }
-        if (count !== 0) {
-          return {
-            query_string: {
-              query: string
-            }
-          };
-        }
+        return {
+          bool: {
+            must
+          }
+        };
       }
     }
     return undefined;

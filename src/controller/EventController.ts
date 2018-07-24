@@ -41,4 +41,13 @@ export class EventController {
     );
   }
 
+  @Query()
+  @Authorized(['event:read'])
+  async eventSearch({ query, first, after, filter, orderBy }) {
+    return this.paginator.paginate(
+      await this.eventRepository.query(query, first || 10, after, filter, orderBy),
+      after
+    );
+  }
+
 }

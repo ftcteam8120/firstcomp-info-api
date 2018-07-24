@@ -130,7 +130,12 @@ export class Event implements Node {
 }
 
 export interface EventFilter {
-  program?: Program;
+  program?: Program[];
+  season?: string[];
+  year?: number[];
+  country?: string[];
+  countryCode?: string[];
+  stateProv?: string[];
 }
 
 export enum EventOrder {
