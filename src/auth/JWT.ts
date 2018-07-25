@@ -24,7 +24,12 @@ export class JWT {
   }
   
   public async decodeToken(token: string): Promise<CurrentUser> {
-    const data: any = jwt.verify(token, JWT_SECRET);
+    let data: any;
+    try {
+      data = jwt.verify(token, JWT_SECRET);
+    } catch {
+      return null;
+    }
     const entityManager = getManager();
     const user = await entityManager.findOneOrFail(User, { id: data.sub });
     return new CurrentUser(user, data.scopes);

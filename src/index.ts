@@ -120,11 +120,13 @@ bootstrap({
     const request = action.request;
     let currentUser;
     const auth = request.headers.authorization;
-    // If there is an auth token attempt to get the current user
     if (auth) {
+      // If there is an auth token attempt to get the current user
       const token = auth.split(' ')[1];
       currentUser = await container.get(JWT).decodeToken(token);
-    } else {
+    }
+    // Check if we got a valid user back from the token
+    if (!currentUser) {
       // Load the guest role scopes from the DB
       const guestRole = await container.get(ScopeTools).findRole('guest');
       currentUser = new CurrentUser(null, guestRole.scopes);
