@@ -26,11 +26,11 @@ export class AllianceResolver {
   async picks(alliance: Alliance) {
     if (!alliance.picks) return [];
     const picks: Team[] = [];
-    for (const number of picks as any[]) {
+    for (const number of alliance.picks as number[]) {
       picks.push(
         await this.teamRepository.findByNumber(
           (alliance.event as Event).program,
-          number as number
+          number
         )
       );
     }

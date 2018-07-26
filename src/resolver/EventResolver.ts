@@ -13,6 +13,7 @@ import { Ranking } from '../entity/Ranking';
 import { Paginator } from '../util/Paginator';
 import * as _ from 'lodash';
 import { EventRepository } from '../repository/EventRepository';
+import { TheOrangeAlliance } from '../service/TheOrangeAlliance';
 
 @Resolver(Event)
 export class EventResolver {
@@ -22,6 +23,7 @@ export class EventResolver {
     private firstSearch: FIRSTSearch,
     private idGenerator: IDGenerator,
     private theBlueAlliance: TheBlueAlliance,
+    private theOrangeAlliance: TheOrangeAlliance,
     private paginator: Paginator,
     private matchRepository: MatchRepository,
     private eventRepository: EventRepository
@@ -30,12 +32,10 @@ export class EventResolver {
   @Resolve()
   @Authorized(['event:read'])
   async divisions(event: Event, { first, after, filter, orderBy }) {
-    // Return an empty array if the event does not have divisions
-    if (!event.divisions) return [];
     // Pass the data into the paginator
     return this.paginator.paginate(
       await this.eventRepository.findDivisions(
-        event.divisions,
+        event,
         first,
         after,
         filter,
@@ -78,6 +78,9 @@ export class EventResolver {
     if (event.program === Program.FRC) {
       return this.theBlueAlliance.findAlliances(event);
     }
+    if (event.program === Program.FTC) {
+      return this.theOrangeAlliance.findAlliances(event);
+    }
     return this.entityManager.find(Alliance, {
       event: event.code,
       eventSeason: event.season
@@ -96,6 +99,9 @@ export class EventResolver {
   awards(event: Event) {
     if (event.program === Program.FRC) {
       return this.theBlueAlliance.findAwards(event);
+    }
+    if (event.program === Program.FTC) {
+      return this.theOrangeAlliance.findAwards(event);
     }
     return this.entityManager.find(Award, {
       event: event.code,
@@ -116,6 +122,9 @@ export class EventResolver {
     if (event.program === Program.FRC) {
       return this.theBlueAlliance.findRankings(event);
     }
+    if (event.program === Program.FTC) {
+      return this.theOrangeAlliance.findRankings(event);
+    }
     return this.entityManager.find(Ranking, {
       event: event.code,
       eventSeason: event.season
@@ -127,6 +136,14 @@ export class EventResolver {
       }
       return rankings;
     });
+  }
+
+  @Resolve()
+  @Authorized(['webcast:read'])
+  webcasts(event: Event) {
+    if (event.webcasts) return event.webcasts;
+    if (event.program === Program.FTC) return this.theOrangeAlliance.findEventWebcasts(event);
+    return [];
   }
 
 }

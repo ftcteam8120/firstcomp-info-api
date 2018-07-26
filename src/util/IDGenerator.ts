@@ -62,12 +62,37 @@ export class IDGenerator {
     };
   }
 
+  public toaMatch(key: string, eventId: string): string {
+    return this.btoa(
+      'Match-TOA-' + eventId + '-' + key
+    );
+  }
+
+  public isToaMatch(id: string): boolean  {
+    const split: any[] = this.atob(id).split('-');
+    return split[1] === 'TOA';
+  }
+
+  public decodeToaMatch(id: string): {
+    key: string;
+    eventSeason: number;
+    eventCode: string;
+  } {
+    const split: any[] = this.atob(id).split('-');
+    if (split[0] !== 'Match' || split[1] !== 'TOA') throw new Error('Invalid Match ID');
+    return {
+      key: split.splice(3).join('-'), // Use the rest of the ID as a match key (for TOA)
+      eventSeason: this.decodeEvent(split[2]).season,
+      eventCode: this.decodeEvent(split[2]).code
+    };
+  }
+
   public decodeEvent(id: string): { season: number, code: string } {
     const split: any[] = this.atob(id).split('-');
     if (split[0] !== 'Event') throw new Error('Invalid Event ID');
     return {
       season: split[1] * 1,
-      code: split[2]
+      code: split.splice(2).join('-') // Use the rest of the ID as a code (for TOA)
     };
   }
 

@@ -22,6 +22,9 @@ enum EventType {
   OFFICIAL_EXPO
   TRAINING_EDUCATION
   DISPLAY_DEMONSTRATION
+  OTHER
+  SPRING_EVENT
+  SUPER_QUALIFIER
 }
 
 enum PlayoffType {
@@ -40,7 +43,7 @@ type Event implements Node {
   code: String!
   divisions(first: Int, after: String, filter: EventFilter, orderBy: [EventOrder]): EventConnection
   address: String
-  name: String!
+  name: String
   description: String
   season: Season
   district: String
@@ -50,6 +53,7 @@ type Event implements Node {
   countryCode: String
   country: Country
   timezone: String
+  week: Int
   stateProv: String
   postalCode: String
   dateStart: Date

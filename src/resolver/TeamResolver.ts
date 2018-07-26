@@ -3,6 +3,7 @@ import { Team, Program } from '../entity/Team';
 import { FIRSTSearch } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { TheBlueAlliance } from '../service/TheBlueAlliance';
+import { TheOrangeAlliance } from '../service/TheOrangeAlliance';
 
 @Resolver(Team)
 export class TeamResolver {
@@ -10,7 +11,8 @@ export class TeamResolver {
   constructor(
     private firstSearch: FIRSTSearch,
     private idGenerator: IDGenerator,
-    private theBlueAlliance: TheBlueAlliance
+    private theBlueAlliance: TheBlueAlliance,
+    private theOrangeAlliance: TheOrangeAlliance
   ) {}
 
   @Resolve()
@@ -38,15 +40,25 @@ export class TeamResolver {
   @Resolve()
   @Authorized(['award:read'])
   awards(team: Team) {
-    if (team.program !== Program.FRC) return [];
-    return this.theBlueAlliance.findTeamAwards(team);
+    if (team.program === Program.FRC) {
+      return this.theBlueAlliance.findTeamAwards(team);
+    }
+    if (team.program === Program.FTC) {
+      return this.theOrangeAlliance.findTeamAwards(team);
+    }
+    return [];
   }
 
   @Resolve()
   @Authorized(['event:read'])
   events(team: Team) {
-    if (team.program !== Program.FRC) return [];
-    return this.theBlueAlliance.findTeamEvents(team);
+    if (team.program === Program.FRC) {
+      return this.theBlueAlliance.findTeamEvents(team);
+    }
+    if (team.program === Program.FTC) {
+      return this.theOrangeAlliance.findTeamEvents(team);
+    }
+    return [];
   }
 
   @Resolve()

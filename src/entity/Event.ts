@@ -32,7 +32,10 @@ export enum EventType {
   OFF_SEASON_WITH_AZURE_SYNC = 'OFF_SEASON_WITH_AZURE_SYNC',
   OFFICIAL_EXPO = 'OFFICIAL_EXPO',
   TRAINING_EDUCATION = 'TRAINING_EDUCATION',
-  DISPLAY_DEMONSTRATION = 'DISPLAY_DEMONSTRATION'
+  DISPLAY_DEMONSTRATION = 'DISPLAY_DEMONSTRATION',
+  OTHER = 'OTHER',
+  SPRING_EVENT = 'SPRING_EVENT',
+  SUPER_QUALIFIER = 'SUPER_QUALIFIER'
 }
 
 export enum PlayoffType {
@@ -93,6 +96,9 @@ export class Event implements Node {
   @Column({ nullable: true })
   timezone?: string;
 
+  @Column({ nullable: true })
+  week?: number;
+
   @Column({ type: 'date', nullable: true })
   dateStart?: string;
 
@@ -127,6 +133,8 @@ export class Event implements Node {
 
   webcasts?: Webcast[];
 
+  toaId?: string;
+
 }
 
 export interface EventFilter {
@@ -136,6 +144,7 @@ export interface EventFilter {
   country?: string[];
   countryCode?: string[];
   stateProv?: string[];
+  name?: string[];
 }
 
 export enum EventOrder {

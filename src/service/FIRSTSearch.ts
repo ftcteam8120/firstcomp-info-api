@@ -6,6 +6,7 @@ import { ElasticSearch, ElasticResult } from '../util/ElasticSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { Season, SeasonFilter, SeasonOrder } from '../entity/Season';
 import { Country, CountryFilter, CountryOrder } from '../entity/Country';
+import { TOAEvent } from './TheOrangeAlliance';
 
 export interface FindResult<T> {
   totalCount: number;
@@ -301,6 +302,9 @@ export class FIRSTSearch {
 
   private buildEventQuery(filter: EventFilter): any {
     const must = [];
+    if (filter.name) {
+      must.push(this.elasticSearch.makeBool('event_name', filter.name));
+    }
     if (filter.year) {
       must.push(this.elasticSearch.makeBool('event_season', filter.year));
     }
@@ -633,6 +637,33 @@ export class FIRSTSearch {
       return Promise.all(cachePromises).then(() => {
         return converted;
       });
+    });
+  }
+
+  /**
+   * Matches a TOA event to the official FIRST database
+   * @param toaEvent The event returned by TOA
+   */
+  public async matchToaEvent(toaEvent: TOAEvent): Promise<Event> {
+    return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
+      size: 1,
+      query: this.buildEventQuery({
+        year: [(toaEvent.season_key.substr(0, 2) as any * 1) + 2000],
+        program: [Program.FTC],
+        countryCode: [toaEvent.country],
+        stateProv: [toaEvent.state_prov],
+        name: [toaEvent.event_name]
+      })
+    }).then((result: ElasticResult) => {
+      if (result.totalCount === 0) return null;
+      const rawEvent = result.hits[0];
+      return this.convertEvent(
+        this.idGenerator.event(
+          rawEvent.event_season,
+          rawEvent.event_code
+        ),
+        rawEvent
+      );
     });
   }
 

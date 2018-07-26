@@ -7,6 +7,7 @@ import { Event } from '../entity/Event';
 import { FindResult } from '../service/FIRSTSearch';
 import * as _ from 'lodash';
 import { Program } from '../entity/Team';
+import { TheOrangeAlliance } from '../service/TheOrangeAlliance';
 
 @Service()
 export class MatchRepository {
@@ -15,6 +16,7 @@ export class MatchRepository {
     private entityManager: EntityManager,
     private idGenerator: IDGenerator,
     private theBlueAlliance: TheBlueAlliance,
+    private theOrangeAlliance: TheOrangeAlliance
   ) { }
 
   /**
@@ -22,18 +24,11 @@ export class MatchRepository {
    * @param id The match ID
    */
   public async findById(id: string): Promise<Match> {
-    // Decode the match ID
-    const decoded = this.idGenerator.decodeMatch(id);
-    // Attempt to find the match in the DB
-    const match = await this.entityManager.findOne(Match, {
-      number: decoded.number,
-      setNumber: decoded.setNumber,
-      level: decoded.level,
-      event: decoded.eventCode,
-      eventSeason: decoded.eventSeason
-    });
-    // Otherwise, attempt to search the blue alliance
-    if (!match) return this.theBlueAlliance.findMatch(id);
+    // Check if the match if from TOA
+    if (this.idGenerator.isToaMatch(id)) {
+      return this.theOrangeAlliance.findMatch(id);
+    }
+    return this.theBlueAlliance.findMatch(id);
   }
 
   /**
@@ -55,13 +50,17 @@ export class MatchRepository {
     // Decode the cursor
     let from = 0;
     if (after) from = this.idGenerator.decodeCursor(after).from + 1;
-    // Limit the count to how many were requested
-    let limit = event.divisions.length;
-    if (first < limit - from) {
-      limit = first;
-    }
     if (event.program === Program.FRC) {
       matches = await this.theBlueAlliance.findMatches(event);
+      // Slice the array if less are requested
+      if (first) {
+        if (first < matches.length) matches = matches.slice(from, first + from);
+      } else {
+        // Slice the front of the array
+        matches = matches.slice(from, matches.length);
+      }
+    } else if (event.program === Program.FTC) {
+      matches = await this.theOrangeAlliance.findMatches(event);
       // Slice the array if less are requested
       if (first) {
         if (first < matches.length) matches = matches.slice(from, first + from);
@@ -91,6 +90,10 @@ export class MatchRepository {
         }
         return matches;
       });
+    }
+    let limit = matches.length;
+    if (first < limit - from) {
+      limit = first;
     }
     if (filter) {
       // Filter the objects first

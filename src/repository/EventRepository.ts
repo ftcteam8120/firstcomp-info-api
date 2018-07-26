@@ -8,6 +8,7 @@ import { Program } from '../entity/Team';
 import { TheBlueAlliance } from '../service/TheBlueAlliance';
 import { RedisCache } from '../util/RedisCache';
 import * as _ from 'lodash';
+import { TheOrangeAlliance } from '../service/TheOrangeAlliance';
 
 @Service()
 export class EventRepository {
@@ -18,6 +19,7 @@ export class EventRepository {
     private idGenerator: IDGenerator,
     private dataMerge: DataMerge,
     private theBlueAlliance: TheBlueAlliance,
+    private theOrangeAlliance: TheOrangeAlliance,
     private redisCache: RedisCache
   ) { }
 
@@ -27,16 +29,24 @@ export class EventRepository {
    */
   public async findById(id: string): Promise<Event> {
     // Check for a cached value
-    const cached = await this.redisCache.get<Event>(id);
-    if (cached) return cached;
+    // const cached = await this.redisCache.get<Event>(id);
+    // if (cached) return cached;
     const decoded = this.idGenerator.decodeEvent(id);
-    const event = this.dataMerge.mergeOne<Event>(
+    let event = this.dataMerge.mergeOne<Event>(
+      await this.theOrangeAlliance.findEvent(id),
       await this.theBlueAlliance.findEvent(id),
       await this.firstSearch.findEvent(id),
       await this.entityManager.findOne(Event, decoded)
     );
-    // Cache the event
-    if (event) await this.redisCache.set(event);
+    
+    if (event) {
+      // Inject extra data from TOA if it a FTC event
+      if (event.program === Program.FTC) {
+        event = await this.theOrangeAlliance.injectToaData(event);
+      }
+      // Cache the event
+      await this.redisCache.set(event);
+    }
     return event;
   }
   
@@ -96,7 +106,7 @@ export class EventRepository {
    * @param orderBy An array of EventOrder enums
    */
   public async findDivisions(
-    divisionIds: string[],
+    event: Event,
     first: number,
     after?: string,
     filter?: EventFilter,
@@ -107,13 +117,19 @@ export class EventRepository {
     let from = 0;
     if (after) from = this.idGenerator.decodeCursor(after).from + 1;
     // Limit the count to how many were requested
-    let limit = divisionIds.length;
+    let limit;
+    if (event.program === Program.FTC) {
+      divisions = await this.theOrangeAlliance.findDivisions(event);
+      limit = divisions.length;
+    } else if (event.program === Program.FRC) {
+      limit = event.divisions.length;
+      // Query all of the divisions
+      for (let i = from; i < limit; i += 1) {
+        divisions.push(await this.theBlueAlliance.findEvent(event.divisions[i]));
+      }
+    }
     if (first < limit - from) {
       limit = first;
-    }
-    // Query all of the divisions
-    for (let i = from; i < limit; i += 1) {
-      divisions.push(await this.theBlueAlliance.findEvent(divisionIds[i]));
     }
     if (filter) {
       // Filter the objects first

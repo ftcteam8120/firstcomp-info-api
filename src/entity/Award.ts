@@ -17,7 +17,7 @@ export enum AwardType {
   ROOKIE_ALL_STAR = 'ROOKIE_ALL_STAR',
   GRACIOUS_PROFESSIONALISM = 'GRACIOUS_PROFESSIONALISM',
   COOPERTITION = 'COOPERTITION',
-  JUDGES = 'COOPERTITION',
+  JUDGES = 'JUDGES',
   HIGHEST_ROOKIE_SEED = 'HIGHEST_ROOKIE_SEED',
   ROOKIE_INSPIRATION = 'ROOKIE_INSPIRATION',
   INDUSTRIAL_DESIGN = 'INDUSTRIAL_DESIGN',
@@ -75,7 +75,16 @@ export enum AwardType {
   WILDCARD = 'WILDCARD',
   CHAIRMANS_FINALIST = 'CHAIRMANS_FINALIST',
   OTHER = 'OTHER',
-  AUTONOMOUS = 'AUTONOMOUS'
+  AUTONOMOUS = 'AUTONOMOUS',
+  INSPIRE = 'INSPIRE',
+  THINK = 'THINK',
+  CONNECT = 'CONNECT',
+  INNOVATE = 'INNOVATE',
+  DESIGN = 'DESIGN',
+  MODIVATE = 'MODIVATE',
+  CONTROL = 'CONTROL',
+  PROMOTE = 'PROMOTE',
+  COMPASS = 'COMPASS'
 }
 
 @Entity()
@@ -94,8 +103,8 @@ export class Award {
   @Column()
   name: string;
 
-  @Column()
-  year: number;
+  @Column({ nullable: true })
+  year?: number;
 
   @OneToMany(type => AwardRecipient, recipient => recipient.award)
   recipients: AwardRecipient[];

@@ -89,6 +89,8 @@ export class Match implements Node {
 
   videos?: Video[];
 
+  toaId?: string;
+
 }
 
 export interface MatchFilter {

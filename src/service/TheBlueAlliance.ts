@@ -88,6 +88,7 @@ export class TheBlueAlliance  {
       countryCode: data.country,
       stateProv: data.state_prov,
       timezone: data.timezone,
+      week: data.week,
       type: this.convertEventType(data.event_type),
       website: data.website,
       program: Program.FRC,
@@ -224,13 +225,16 @@ export class TheBlueAlliance  {
   }
 
   private convertScores(season: number, data: any): ScoreData {
-    switch (season) {
-      case 2015: return this.convertOldScores(data.score_breakdown);
-      case 2016: return this.convertNewScores(data.score_breakdown);
-      case 2017: return this.convertNewScores(data.score_breakdown);
-      case 2018: return this.convertNewScores(data.score_breakdown);
-      default: return this.convertNewScores(data.score_breakdown);
+    if (data.score_breakdown) {
+      switch (season) {
+        case 2015: return this.convertOldScores(data.score_breakdown);
+        case 2016: return this.convertNewScores(data.score_breakdown);
+        case 2017: return this.convertNewScores(data.score_breakdown);
+        case 2018: return this.convertNewScores(data.score_breakdown);
+        default: return this.convertNewScores(data.score_breakdown);
+      }
     }
+    return {};
   }
 
   private convertMatchVideoType(type: string): VideoType {
