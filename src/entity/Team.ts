@@ -28,6 +28,9 @@ export class Team implements Node {
   name?: string;
 
   @Column({ nullable: true })
+  photoUrl?: string;
+
+  @Column({ nullable: true })
   sponsors?: string;
 
   @Column({ nullable: true })

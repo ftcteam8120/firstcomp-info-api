@@ -114,6 +114,9 @@ export class Event implements Node {
   @Column({ enum: Program, nullable: true })
   program?: Program;
 
+  @Column({ nullable: true })
+  photoUrl?: string;
+
   @OneToMany(type => Match, match => match.event)
   matches?: Match[];
 

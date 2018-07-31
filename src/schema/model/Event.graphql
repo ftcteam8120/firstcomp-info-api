@@ -61,6 +61,7 @@ type Event implements Node {
   type: EventType
   website: String
   program: Program
+  photoUrl: String
   matches(first: Int, after: String, filter: MatchFilter, orderBy: [MatchOrder]): MatchConnection
   teams(first: Int, after: String, filter: TeamFilter, orderBy: [TeamOrder]): TeamConnection
   alliances: [Alliance]

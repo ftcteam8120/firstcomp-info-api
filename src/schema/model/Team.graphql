@@ -13,6 +13,7 @@ type Team implements Node {
   program: Program!
   number: Int!
   name: String
+  photoUrl: String
   sponsors: String
   robots: [Robot]
   city: String
