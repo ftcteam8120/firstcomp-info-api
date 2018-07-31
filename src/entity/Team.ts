@@ -53,6 +53,8 @@ export class Team implements Node {
 
   seasonId?: string;
 
+  season?: number;
+
 }
 
 export interface TeamFilter {

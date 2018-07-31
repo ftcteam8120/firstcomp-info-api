@@ -16,6 +16,8 @@ import { SocialMedia, SocialMediaType } from '../entity/SocialMedia';
 import { Webcast, WebcastType } from '../entity/Webcast';
 import { Video, VideoType } from '../entity/Video';
 import { Ranking } from '../entity/Ranking';
+import { FIRSTSearch } from './FIRSTSearch';
+import * as _ from 'lodash';
 
 interface ScoreData {
   scoreRedTeleop?: number;
@@ -37,7 +39,8 @@ export class TheBlueAlliance  {
 
   constructor(
     private idGenerator: IDGenerator,
-    private redisCache: RedisCache
+    private redisCache: RedisCache,
+    private firstSearch: FIRSTSearch
   ) { }
 
   private async request(url: string) {
@@ -316,6 +319,50 @@ export class TheBlueAlliance  {
         );
       }
       return matches;
+    });
+  }
+
+  private convertTeam(id: string, event: Event, data: any): Team {
+    return {
+      id,
+      number: data.team_number,
+      program: Program.FRC,
+      name: data.nickname,
+      sponsors: data.name,
+      city: data.city,
+      stateProv: data.state_prov,
+      countryCode: data.country,
+      rookieYear: data.rookie_year,
+      website: data.website,
+      season: event.season
+    };
+  }
+
+  public async findTeams(event: Event): Promise<Team[]> {
+    return this.request(
+      'event/' + event.season + event.code.toLowerCase() +
+      '/teams'
+    ).then(async (rawTeams: any) => {
+      const teams: Team[] = [];
+      for (const data of rawTeams) {
+        teams.push(this.convertTeam(
+          this.idGenerator.team(event.program, data.team_number),
+          event,
+          data
+        ));
+      }
+      // Add all the division teams (recursive)
+      if (event.divisions) {
+        for (const div of event.divisions) {
+          teams.push(...await this.findTeams(
+            await this.findEvent(div)
+          ));
+        }
+      }
+      // Remove duplicates
+      return _.uniqBy(teams, (t) => {
+        return t.id;
+      });
     });
   }
 

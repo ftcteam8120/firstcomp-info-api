@@ -6,7 +6,7 @@ import { FIRSTSearch } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { EntityManager } from 'typeorm';
 import { Award } from '../entity/Award';
-import { Program } from '../entity/Team';
+import { Program, Team } from '../entity/Team';
 import { TheBlueAlliance } from '../service/TheBlueAlliance';
 import { MatchRepository } from '../repository/MatchRepository';
 import { Ranking } from '../entity/Ranking';
@@ -144,6 +144,65 @@ export class EventResolver {
     if (event.webcasts) return event.webcasts;
     if (event.program === Program.FTC) return this.theOrangeAlliance.findEventWebcasts(event);
     return [];
+  }
+
+  @Resolve()
+  @Authorized(['team:read'])
+  async teams(event: Event, { first, after, filter, orderBy }) {
+    let teams: Team[] = [];
+    // Decode the cursor
+    let from = 0;
+    if (after) from = this.idGenerator.decodeCursor(after).from + 1;
+    if (event.program === Program.FRC) {
+      teams = await this.theBlueAlliance.findTeams(event);
+      // Slice the array if less are requested
+      if (first) {
+        if (first < teams.length) teams = teams.slice(from, first + from);
+      } else {
+        // Slice the front of the array
+        teams = teams.slice(from, teams.length);
+      }
+    } else if (event.program === Program.FTC) {
+      teams = await this.theOrangeAlliance.findTeams(event);
+      // Slice the array if less are requested
+      if (first) {
+        if (first < teams.length) teams = teams.slice(from, first + from);
+      } else {
+        // Slice the front of the array
+        teams = teams.slice(from, teams.length);
+      }
+    }
+    let limit = teams.length;
+    if (first < limit - from) {
+      limit = first;
+    }
+    if (filter) {
+      // Filter the objects first
+      for (const f in filter) {
+        for (const req of filter[f]) {
+          teams = _.filter(teams, { [f]: req });
+        }
+      }
+    }
+    if (orderBy) {
+      // Get the orders from the orderBy arg
+      const orderFields: string[] = [];
+      const orders: string[] = [];
+      let split: string[];
+      for (const order of orderBy) {
+        split = (order as string).split('_');
+        orderFields.push(split[0]);
+        orders.push(split[1].toLowerCase());
+      }
+      // Order last
+      teams = _.orderBy(teams, orderFields, orders);
+    }
+    return this.paginator.paginate({
+      totalCount: teams.length,
+      hasNextPage: first < limit - from,
+      hasPreviousPage: from > 0,
+      data: teams
+    }, after);
   }
 
 }

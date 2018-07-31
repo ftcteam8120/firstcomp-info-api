@@ -243,6 +243,42 @@ export class TheOrangeAlliance {
     });
   }
 
+  private convertTeam(id: string, event: Event, data: any): Team {
+    return {
+      id,
+      number: data.team_number,
+      program: Program.FTC,
+      name: data.team_name_short,
+      sponsors: data.team_name_long,
+      city: data.city,
+      stateProv: data.state_prov,
+      countryCode: data.country,
+      rookieYear: data.rookie_year,
+      website: data.website,
+      season: event.season
+    };
+  }
+
+  public async findTeams(event: Event): Promise<Team[]> {
+    const toaId = await this.findTOAId(event);
+    if (!toaId) return [];
+    return this.request(
+      'event/' +
+      toaId +
+      '/teams'
+    ).then((rawTeams: any[]) => {
+      const teams: Team[] = [];
+      for (const team of rawTeams) {
+        teams.push(this.convertTeam(
+          this.idGenerator.team(event.program, team.team_number),
+          event,
+          team
+        ));
+      }
+      return teams;
+    });
+  }
+
   private convertMatchTeam(data: any, match: Match): MatchTeam {
     return {
       match,

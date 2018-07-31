@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, OneToMany, ManyToMany, JoinTable, Index } from 'typeorm';
-import { Program } from './Team';
+import { Program, Team } from './Team';
 import { Match } from './Match';
 import { User } from './User';
 import { Node } from './Node';

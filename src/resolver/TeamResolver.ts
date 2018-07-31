@@ -21,6 +21,9 @@ export class TeamResolver {
     if (team.seasonId) {
       return this.firstSearch.findSeason(team.seasonId);
     }
+    if (team.season) {
+      return this.firstSearch.findSeasonByYear(team.program, team.season);
+    }
     return null;
   }
 

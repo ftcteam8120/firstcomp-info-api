@@ -43,7 +43,7 @@ export class MatchRepository {
     event: Event,
     first: number,
     after?: string,
-    filter?: MatchFilter,
+    filter?: MatchFilter[],
     orderBy?: MatchOrder[]
   ): Promise<FindResult<Match>> {
     let matches: Match[] = [];
@@ -97,7 +97,11 @@ export class MatchRepository {
     }
     if (filter) {
       // Filter the objects first
-      matches = _.filter(matches, filter as any);
+      for (const f in filter as any) {
+        for (const req of filter[f]) {
+          matches = _.filter(matches, { [f]: req });
+        }
+      }
     }
     if (orderBy) {
       // Get the orders from the orderBy arg
