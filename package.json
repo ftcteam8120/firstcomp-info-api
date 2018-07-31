@@ -1,7 +1,7 @@
 {
-  "name": "firstcomp-info-api",
+  "name": "roboscorz-api",
   "version": "0.0.1",
-  "description": "The backend GraphQL API for FIRSTComp.info",
+  "description": "The backend GraphQL API for the RoboScorz app",
   "main": "src/index.ts",
   "author": "FTC Team 8120",
   "license": "MIT",

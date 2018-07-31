@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "firstcomp-info-api",
+      "name": "roboscorz-api",
       "script": "./build/index.js",
       "watch": true,
       "env": {
