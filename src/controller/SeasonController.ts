@@ -2,12 +2,13 @@ import { Controller, Query, Authorized } from 'vesper';
 import { FIRSTSearch } from '../service/FIRSTSearch';
 import { Paginator } from '../util/Paginator';
 import { SeasonOrder } from '../entity/Season';
+import { SeasonRepository } from '../repository/SeasonRepository';
 
 @Controller()
 export class SeasonController {
 
   constructor(
-    private firstSearch: FIRSTSearch,
+    private seasonRepository: SeasonRepository,
     private paginator: Paginator
   ) { }
 
@@ -15,7 +16,7 @@ export class SeasonController {
   @Authorized(['season:read'])
   async seasons({ first, after, filter, orderBy }) {
     return this.paginator.paginate(
-      await this.firstSearch.findSeasons(first || 100, after, filter, orderBy),
+      await this.seasonRepository.find(first || 100, after, filter, orderBy),
       after
     );
   }
@@ -23,13 +24,13 @@ export class SeasonController {
   @Query()
   @Authorized(['season:read'])
   season({ id }) {
-    return this.firstSearch.findSeason(id);
+    return this.seasonRepository.findById(id);
   }
 
   @Query()
   @Authorized(['season:read'])
   seasonByYear({ program, year }) {
-    return this.firstSearch.findSeasonByYear(program, year);
+    return this.seasonRepository.findByYear(program, year);
   }
 
 }

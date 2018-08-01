@@ -3,6 +3,7 @@ type Season implements Node {
   name: String
   program: Program
   startYear: Int
+  article: Article
 }
 
 type SeasonEdge {

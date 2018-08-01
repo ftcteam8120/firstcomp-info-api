@@ -51,6 +51,8 @@ import { Alliance } from './entity/Alliance';
 import { Award } from './entity/Award';
 import { Role } from './entity/Role';
 import { Ranking } from './entity/Ranking';
+import { Season } from './entity/Season';
+import { Article } from './entity/Article';
 
 // Import resolvers
 import { resolveType } from './entity/Node';
@@ -87,7 +89,9 @@ bootstrap({
     Award,
     AwardRecipient,
     Role,
-    Ranking
+    Ranking,
+    Season,
+    Article
   ],
   resolvers: [
     TeamResolver,

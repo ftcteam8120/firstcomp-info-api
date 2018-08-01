@@ -1,11 +1,28 @@
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { Node } from './Node';
 import { Program } from './Team';
+import { Article } from './Article';
 
+@Entity()
 export class Season implements Node {
   id: string;
+  
+  @PrimaryColumn()
   program: Program;
-  name: string;
+
+  @PrimaryColumn()
   startYear: number;
+
+  @Column({ nullable: true })
+  name?: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @OneToOne(type => Article, { nullable: true })
+  @JoinColumn()
+  article?: Article | string;
+
 }
 
 export interface SeasonFilter {

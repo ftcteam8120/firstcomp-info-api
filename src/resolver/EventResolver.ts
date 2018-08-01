@@ -14,6 +14,7 @@ import { Paginator } from '../util/Paginator';
 import * as _ from 'lodash';
 import { EventRepository } from '../repository/EventRepository';
 import { TheOrangeAlliance } from '../service/TheOrangeAlliance';
+import { Article } from '../entity/Article';
 
 @Resolver(Event)
 export class EventResolver {
@@ -203,6 +204,13 @@ export class EventResolver {
       hasPreviousPage: from > 0,
       data: teams
     }, after);
+  }
+
+  @Resolve()
+  @Authorized(['article:read'])
+  articles(event: Event) {
+    if (!event.articles) return [];
+    return this.entityManager.findByIds(Article, event.articles);
   }
 
 }

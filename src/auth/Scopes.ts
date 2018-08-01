@@ -27,6 +27,7 @@ export const SCOPES: Scope[] = [
       'description',
       'venue',
       'city',
+      'week',
       'countryCode',
       'timezone',
       'stateProv',
@@ -38,6 +39,7 @@ export const SCOPES: Scope[] = [
       'matches',
       'alliances',
       'awards',
+      'articles',
       'webcasts',
       'rankings',
       'season'
@@ -142,7 +144,8 @@ export const SCOPES: Scope[] = [
     fields: [
       'name',
       'program',
-      'startYear'
+      'startYear',
+      'article'
     ]
   },
   {
@@ -283,6 +286,21 @@ export const SCOPES: Scope[] = [
     fields: [
       'name',
       'code'
+    ]
+  },
+  {
+    entity: 'article',
+    actions: [
+      ScopeAction.READ
+    ],
+    fields: [
+      'featured',
+      'title',
+      'tags',
+      'description',
+      'photoUrl',
+      'url',
+      'data'
     ]
   }
 ];

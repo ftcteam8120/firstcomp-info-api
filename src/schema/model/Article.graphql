@@ -1,0 +1,10 @@
+type Article implements Node {
+  id: ID!
+  featured: Boolean
+  title: String
+  tags: [String]
+  description: String
+  photoUrl: String
+  url: String
+  data: String
+}

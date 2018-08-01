@@ -7,6 +7,7 @@ import { Alliance } from './Alliance';
 import { Award } from './Award';
 import { Webcast } from './Webcast';
 import { Ranking } from './Ranking';
+import { Article } from './Article';
 
 export enum EventType {
   UNLABLED = 'UNLABLED',
@@ -131,6 +132,9 @@ export class Event implements Node {
 
   @Column({ enum: PlayoffType, nullable: true })
   playoffType?: string;
+
+  @Column({ array: true, type: 'varchar' })
+  articles?: Article[];
 
   divisions?: string[];
 
