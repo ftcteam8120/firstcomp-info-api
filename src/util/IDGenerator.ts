@@ -7,11 +7,11 @@ import { MatchLevel } from '../entity/Match';
 export class IDGenerator {
 
   public atob(a: string): string {
-    return new Buffer(a, 'base64').toString('binary');
+    return Buffer.from(a, 'base64').toString('binary');
   }
   
   public btoa(b: string): string {
-    return new Buffer(b).toString('base64');
+    return Buffer.from(b).toString('base64');
   }
 
   public getNodeType(id: string): string {
