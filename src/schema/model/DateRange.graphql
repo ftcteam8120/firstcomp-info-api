@@ -1,0 +1,6 @@
+input DateRange {
+  gte: String
+  lte: String
+  gt: String
+  lt: String
+}

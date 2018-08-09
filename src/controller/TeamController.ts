@@ -33,10 +33,27 @@ export class TeamController {
   }
 
   @Query()
-  @Authorized(['event:read'])
+  @Authorized(['team:read'])
   async teamSearch({ query, first, after, filter, orderBy }) {
     return this.paginator.paginate(
       await this.teamRepository.query(query, first || 10, after, filter, orderBy),
+      after
+    );
+  }
+
+  @Query()
+  @Authorized(['team:read'])
+  async teamsByLocation({ location, distance, units, first, after, filter, orderBy }) {
+    return this.paginator.paginate(
+      await this.teamRepository.findByLocation(
+        location,
+        distance,
+        units,
+        first,
+        after,
+        filter,
+        orderBy
+      ),
       after
     );
   }

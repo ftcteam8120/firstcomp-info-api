@@ -7,6 +7,19 @@ import { IDGenerator } from '../util/IDGenerator';
 import { Season, SeasonFilter, SeasonOrder } from '../entity/Season';
 import { Country, CountryFilter, CountryOrder } from '../entity/Country';
 import { TOAEvent } from './TheOrangeAlliance';
+import { Location } from 'graphql';
+
+export interface DateRange {
+  gt: string;
+  lt: string;
+  gte: string;
+  lte: string;
+}
+
+export enum Units {
+  KM = 'km',
+  MI = 'mi'
+}
 
 export interface FindResult<T> {
   totalCount: number;
@@ -68,7 +81,8 @@ export class FIRSTSearch {
       rookieYear: data.team_rookieyear,
       website: data.team_web_url,
       profileYear: data.profile_year,
-      seasonId: data.fk_program_seasons ? this.idGenerator.season(data.fk_program_seasons) : null
+      seasonId: data.fk_program_seasons ? this.idGenerator.season(data.fk_program_seasons) : null,
+      location: data.location ? data.location[0] : { lat: null, lon: null }
     };
   }
 
@@ -108,7 +122,8 @@ export class FIRSTSearch {
       type: this.convertEventType(data.event_subtype),
       website: data.event_web_url,
       program: data.event_type,
-      season: data.event_season
+      season: data.event_season,
+      location: data.location ? data.location[0] : { lat: null, lon: null }
     };
   }
 
@@ -300,7 +315,7 @@ export class FIRSTSearch {
     });
   }
 
-  private buildEventQuery(filter: EventFilter): any {
+  private buildEventQuery(filter: EventFilter, dateRange?: DateRange): any {
     const must = [];
     if (filter.name) {
       must.push(this.elasticSearch.makeBool('event_name', filter.name));
@@ -331,6 +346,13 @@ export class FIRSTSearch {
     if (filter.stateProv) {
       must.push(this.elasticSearch.makeBool('event_stateprov', filter.stateProv));
     }
+    if (dateRange) {
+      must.push({
+        range: {
+          date_end: dateRange
+        }
+      });
+    }
     return {
       bool: {
         must
@@ -349,13 +371,14 @@ export class FIRSTSearch {
     first: number,
     after?: string,
     filter: EventFilter = {},
-    orderBy: EventOrder[] = []
+    orderBy: EventOrder[] = [],
+    dateRange?: DateRange
   ): Promise<FindResult<Event>> {
     return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
       size: first + 1,
       from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
       sort: this.elasticSearch.buildSort(this.eventOrderDict, orderBy ? orderBy : []),
-      query: this.buildEventQuery(filter)
+      query: this.buildEventQuery(filter, dateRange),
     }).then((result: ElasticResult) => {
       const converted = this.convertAll(result, first, after, (nodeRaw) => {
         return this.convertEvent(
@@ -508,9 +531,10 @@ export class FIRSTSearch {
     first: number,
     after?: string,
     filter: EventFilter = {},
-    orderBy: EventOrder[] = []
+    orderBy: EventOrder[] = [],
+    dateRange?: DateRange
   ): Promise<FindResult<Event>> {
-    const q = this.buildEventQuery(filter);
+    const q = this.buildEventQuery(filter, dateRange);
     // Add the search terms
     q.bool.must.push({
       bool: {
@@ -664,6 +688,82 @@ export class FIRSTSearch {
         ),
         rawEvent
       );
+    });
+  }
+
+  public async findEventsByLocation(
+    location: Location,
+    distance: number,
+    units: Units,
+    first: number,
+    after?: string,
+    filter: EventFilter = {},
+    orderBy: EventOrder[] = [],
+    dateRange?: DateRange
+  ): Promise<FindResult<Event>> {
+    const q = this.buildEventQuery(filter, dateRange);
+    return this.elasticSearch.query('https://es01.usfirst.org/events/_search', {
+      size: first + 1,
+      from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
+      sort: this.elasticSearch.buildSort(this.eventOrderDict, orderBy ? orderBy : []),
+      query: {
+        filtered: {
+          query: q
+        }
+      },
+      filter: {
+        geo_distance: {
+          location,
+          distance: distance.toString() + units.toString()
+        }
+      }
+    }).then((result: ElasticResult) => {
+      return this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertEvent(
+          this.idGenerator.event(
+            nodeRaw.event_season,
+            nodeRaw.event_code
+          ),
+          nodeRaw
+        );
+      });
+    });
+  }
+
+  public async findTeamsByLocation(
+    location: Location,
+    distance: number,
+    units: Units,
+    first: number,
+    after?: string,
+    filter: TeamFilter = {},
+    orderBy: TeamOrder[] = []
+  ): Promise<FindResult<Team>> {
+    const q = this.buildTeamQuery(filter);
+    return this.elasticSearch.query('https://es01.usfirst.org/teams/_search', {
+      size: first + 1,
+      from: after ? this.idGenerator.decodeCursor(after).from + 1 : 0,
+      sort: this.elasticSearch.buildSort(this.teamOrderDict, orderBy ? orderBy : []),
+      query: {
+        filtered: {
+          query: q
+        }
+      },
+      filter: {
+        geo_distance: {
+          location,
+          distance: distance.toString() + units.toString()
+        }
+      }
+    }).then((result: ElasticResult) => {
+      return this.convertAll(result, first, after, (nodeRaw) => {
+        return this.convertTeam(
+          this.idGenerator.team(
+            nodeRaw.team_type,
+            nodeRaw.team_number_yearly),
+          nodeRaw
+        );
+      });
     });
   }
 

@@ -1,5 +1,6 @@
 import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
 import { Node } from './Node';
+import { Location } from './Location';
 
 export enum Program {
   JFLL = 'JFLL',
@@ -57,6 +58,8 @@ export class Team implements Node {
   seasonId?: string;
 
   season?: number;
+
+  location?: Location;
 
 }
 

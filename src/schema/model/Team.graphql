@@ -29,6 +29,7 @@ type Team implements Node {
   events: [Event]
   media(year: Int!): [Media]
   socialMedia: [SocialMedia]
+  location: Location
 }
 
 type TeamEdge {

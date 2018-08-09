@@ -1,0 +1,4 @@
+enum Units {
+  km
+  mi
+}

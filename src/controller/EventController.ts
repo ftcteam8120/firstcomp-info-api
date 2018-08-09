@@ -34,18 +34,36 @@ export class EventController {
 
   @Query()
   @Authorized(['event:read'])
-  async events({ first, after, filter, orderBy }) {
+  async events({ first, after, filter, orderBy, dateRange }) {
     return this.paginator.paginate(
-      await this.eventRepository.find(first || 10, after, filter, orderBy),
+      await this.eventRepository.find(first || 10, after, filter, orderBy, dateRange),
       after
     );
   }
 
   @Query()
   @Authorized(['event:read'])
-  async eventSearch({ query, first, after, filter, orderBy }) {
+  async eventSearch({ query, first, after, filter, orderBy, dateRange }) {
     return this.paginator.paginate(
-      await this.eventRepository.query(query, first || 10, after, filter, orderBy),
+      await this.eventRepository.query(query, first || 10, after, filter, orderBy, dateRange),
+      after
+    );
+  }
+
+  @Query()
+  @Authorized(['event:read'])
+  async eventsByLocation({ location, distance, units, first, after, filter, orderBy, dateRange }) {
+    return this.paginator.paginate(
+      await this.eventRepository.findByLocation(
+        location,
+        distance,
+        units,
+        first,
+        after,
+        filter,
+        orderBy,
+        dateRange
+      ),
       after
     );
   }

@@ -96,7 +96,11 @@ export class TheBlueAlliance  {
       website: data.website,
       program: Program.FRC,
       webcasts: [],
-      season: data.year
+      season: data.year,
+      location: {
+        lat: data.lat,
+        lon: data.lng
+      }
     };
     const webcasts: Webcast[] = [];
     for (const webcast of data.webcasts) {
@@ -334,7 +338,11 @@ export class TheBlueAlliance  {
       countryCode: data.country,
       rookieYear: data.rookie_year,
       website: data.website,
-      season: event.season
+      season: event.season,
+      location: {
+        lat: data.lat,
+        lon: data.lng
+      }
     };
   }
 

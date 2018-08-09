@@ -1,7 +1,7 @@
 import { EntityManager } from 'typeorm';
 import { Service } from 'typedi';
 import { Event, EventFilter, EventOrder } from '../entity/Event';
-import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
+import { FIRSTSearch, FindResult, DateRange, Units } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { DataMerge } from '../util/DataMerge';
 import { Program } from '../entity/Team';
@@ -9,6 +9,7 @@ import { TheBlueAlliance } from '../service/TheBlueAlliance';
 import { RedisCache } from '../util/RedisCache';
 import * as _ from 'lodash';
 import { TheOrangeAlliance } from '../service/TheOrangeAlliance';
+import { Location } from 'graphql';
 
 @Service()
 export class EventRepository {
@@ -66,11 +67,16 @@ export class EventRepository {
    * @param filter An object containing filters
    * @param orderBy An array of EventOrder enums
    */
-  public async find(first: number, after?: string, filter?: EventFilter, orderBy?: EventOrder[]):
-    Promise<FindResult<Event>> {
+  public async find(
+    first: number,
+    after?: string,
+    filter?: EventFilter,
+    orderBy?: EventOrder[],
+    dateRange?: DateRange
+  ): Promise<FindResult<Event>> {
     return this.dataMerge.mergeMany<Event>(
       Event,
-      await this.firstSearch.findEvents(first, after, filter, orderBy),
+      await this.firstSearch.findEvents(first, after, filter, orderBy, dateRange),
       ['code']
     );
   }
@@ -88,15 +94,41 @@ export class EventRepository {
     first: number,
     after?: string,
     filter?: EventFilter,
-    orderBy?: EventOrder[]
+    orderBy?: EventOrder[],
+    dateRange?: DateRange
   ): Promise<FindResult<Event>> {
     return this.dataMerge.mergeMany<Event>(
       Event,
-      await this.firstSearch.eventSearch(query, first, after, filter, orderBy),
+      await this.firstSearch.eventSearch(query, first, after, filter, orderBy, dateRange),
       ['code']
     );
   }
 
+  public async findByLocation(
+    location: Location,
+    distance: number,
+    units: Units,
+    first: number,
+    after?: string,
+    filter: EventFilter = {},
+    orderBy: EventOrder[] = [],
+    dateRange?: DateRange
+  ): Promise<FindResult<Event>> {
+    return this.dataMerge.mergeMany<Event>(
+      Event,
+      await this.firstSearch.findEventsByLocation(
+        location,
+        distance,
+        units,
+        first,
+        after,
+        filter,
+        orderBy,
+        dateRange
+      ),
+      ['code']
+    );
+  }
   /**
    * Find divisions for an event
    * @param divisionIds The IDs of the divisions to find

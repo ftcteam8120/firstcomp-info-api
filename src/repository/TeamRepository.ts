@@ -1,10 +1,11 @@
 import { EntityManager } from 'typeorm';
 import { Service } from 'typedi';
 import { Team, Program, TeamFilter, TeamOrder } from '../entity/Team';
-import { FIRSTSearch, FindResult } from '../service/FIRSTSearch';
+import { FIRSTSearch, FindResult, Units } from '../service/FIRSTSearch';
 import { IDGenerator } from '../util/IDGenerator';
 import { DataMerge } from '../util/DataMerge';
 import { RedisCache } from '../util/RedisCache';
+import { Location } from 'graphql';
 
 @Service()
 export class TeamRepository {
@@ -81,8 +82,31 @@ export class TeamRepository {
     return this.dataMerge.mergeMany<Team>(
       Team,
       await this.firstSearch.teamSearch(query, first, after, filter, orderBy),
-      ['code']
+      ['program', 'number']
     );
+  }
 
+  public async findByLocation(
+    location: Location,
+    distance: number,
+    units: Units,
+    first: number,
+    after?: string,
+    filter: TeamFilter = {},
+    orderBy: TeamOrder[] = []
+  ): Promise<FindResult<Team>> {
+    return this.dataMerge.mergeMany<Team>(
+      Team,
+      await this.firstSearch.findTeamsByLocation(
+        location,
+        distance,
+        units,
+        first,
+        after,
+        filter,
+        orderBy
+      ),
+      ['program', 'number']
+    );
   }
 }

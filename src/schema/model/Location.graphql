@@ -1,0 +1,9 @@
+type Location {
+  lat: Float
+  lon: Float
+}
+
+input LocationInput {
+  lat: Float!
+  lon: Float!
+}
