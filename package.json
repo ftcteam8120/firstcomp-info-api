@@ -7,8 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "npx nodemon",
-    "build": "npx rimraf build && npx tsc",
-    "prod": "npx rimraf build && npx tsc && node ./build/index",
+    "build": "npx rimraf build && npx tsc && cp -a ./src/schema/. ./build/schema",
+    "prod": "npm run build && node ./build/index",
     "container-remove": "docker rm firstcomp-info-api",
     "container-build": "npm run build && docker build -t firstcomp-info-api .",
     "container-run": "docker run -p 80:80 --name=firstcomp-info-api firstcomp-info-api",
