@@ -15,6 +15,7 @@ import * as _ from 'lodash';
 import { EventRepository } from '../repository/EventRepository';
 import { TheOrangeAlliance } from '../service/TheOrangeAlliance';
 import { Article } from '../entity/Article';
+import { GoogleMaps } from '../service/GoogleMaps';
 
 @Resolver(Event)
 export class EventResolver {
@@ -27,7 +28,8 @@ export class EventResolver {
     private theOrangeAlliance: TheOrangeAlliance,
     private paginator: Paginator,
     private matchRepository: MatchRepository,
-    private eventRepository: EventRepository
+    private eventRepository: EventRepository,
+    private googleMaps: GoogleMaps
   ) { }
   
   @Resolve()
@@ -211,6 +213,17 @@ export class EventResolver {
   articles(event: Event) {
     if (!event.articles) return [];
     return this.entityManager.findByIds(Article, event.articles);
+  }
+
+  @Resolve()
+  placeId(event: Event) {
+    return this.googleMaps.getEventPlaceId(event);
+  }
+
+  @Resolve()
+  photoUrl(event: Event, { maxWidth, index }) {
+    if (event.photoUrl) return event.photoUrl;
+    return this.googleMaps.getEventPhotoUrl(event, maxWidth, index);
   }
 
 }

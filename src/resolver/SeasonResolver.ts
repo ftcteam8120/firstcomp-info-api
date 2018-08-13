@@ -1,6 +1,6 @@
 import { Resolver, Resolve, Authorized } from 'vesper';
 import { Season } from '../entity/Season';
-import { EntityManager } from '../../node_modules/typeorm';
+import { EntityManager } from 'typeorm';
 import { Article } from '../entity/Article';
 
 @Resolver(Season)

@@ -13,19 +13,15 @@ if (process.env.NODE_ENV !== 'prod') {
 }
 
 // Define configuration variables
-const REDIS_URL = process.env.REDIS_URL;
 const PORT = parseInt(process.env.PORT, 2) || 3000;
+export const REDIS_URL = process.env.REDIS_URL;
 export const JWT_SECRET = process.env.JWT_SECRET;
 export const TBA_KEY = process.env.TBA_KEY;
 export const TBA_URL = process.env.TBA_URL;
 export const TOA_KEY = process.env.TOA_KEY;
 export const TOA_URL = process.env.TOA_URL;
 export const TOA_APP = process.env.TOA_APP;
-
-import { RedisCache } from './util/RedisCache';
-
-// Connect to the Redis database
-RedisCache.connect(REDIS_URL);
+export const MAPS_API_KEY = process.env.MAPS_API_KEY;
 
 // Import services
 import { JWT } from './auth/JWT';

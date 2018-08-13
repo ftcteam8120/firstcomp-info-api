@@ -1,17 +1,14 @@
 import * as IORedis from 'ioredis';
 import { Service } from 'typedi';
 import { Node } from '../entity/Node';
+import { REDIS_URL } from '..';
 
 @Service()
 export class RedisCache {
-  private static redis: IORedis.Redis;
+  private redis: IORedis.Redis;
 
-  /**
-   * Connects to Redis
-   * @param url The Redis URL
-   */
-  public static connect(url: string) {
-    RedisCache.redis = new IORedis(url);
+  constructor() {
+    this.redis = new IORedis(REDIS_URL);
   }
 
   /**
@@ -24,8 +21,8 @@ export class RedisCache {
     expire: number = 3600
   ) {
     const val = JSON.stringify(value);
-    await RedisCache.redis.set(value.id, val);
-    await RedisCache.redis.expire(value.id, expire);
+    await this.redis.set(value.id, val);
+    await this.redis.expire(value.id, expire);
   }
 
   /**
@@ -40,8 +37,8 @@ export class RedisCache {
     expire: number = 3600
   ) {
     const val = JSON.stringify(value);
-    await RedisCache.redis.set(key, val);
-    await RedisCache.redis.expire(value.id, expire);
+    await this.redis.set(key, val);
+    if (expire) await this.redis.expire(key, expire);
   }
 
   /**
@@ -49,7 +46,7 @@ export class RedisCache {
    * @param id The object's ID
    */
   public async get<T>(id: string): Promise<T> {
-    return RedisCache.redis.get(id).then((value) => {
+    return this.redis.get(id).then((value) => {
       if (!value) return null;
       return JSON.parse(value);
     });

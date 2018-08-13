@@ -61,7 +61,7 @@ type Event implements Node {
   type: EventType
   website: String
   program: Program
-  photoUrl: String
+  photoUrl(maxWidth: Int, index: Int): String
   matches(first: Int, after: String, filter: MatchFilter, orderBy: [MatchOrder]): MatchConnection
   teams(first: Int, after: String, filter: TeamFilter, orderBy: [TeamOrder]): TeamConnection
   articles: [Article]
@@ -70,6 +70,7 @@ type Event implements Node {
   webcasts: [Webcast]
   rankings: [Ranking]
   location: Location
+  placeId: String
 }
 
 type EventEdge {
