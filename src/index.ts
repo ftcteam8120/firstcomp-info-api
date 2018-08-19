@@ -132,7 +132,7 @@ bootstrap({
     if (!currentUser) {
       // Load the guest role scopes from the DB
       const guestRole = await container.get(ScopeTools).findRole('guest');
-      currentUser = new CurrentUser(null, guestRole.scopes);
+      currentUser = new CurrentUser(null, guestRole.scopes, 0);
     }
     // Set the currentUser on the request container
     container.set(CurrentUser, currentUser);

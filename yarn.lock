@@ -3405,13 +3405,13 @@ type-is@~1.6.15, type-is@~1.6.16:
     media-typer "0.3.0"
     mime-types "~2.1.18"
 
-typedi@^0.7.2:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/typedi/-/typedi-0.7.3.tgz#872fb8d608ed6076e95c1f8cbd2bb33b7d089f0f"
+typedi@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/typedi/-/typedi-0.8.0.tgz#d8e203bd1d41a96e2b0a5c6295147d74b2b2d03e"
 
-typeorm@^0.2.0-alpha.46:
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.2.7.tgz#4bbbace80dc91b1303be13f42d44ebf01d1b2558"
+typeorm@^0.3.0-alpha.0:
+  version "0.3.0-alpha.10"
+  resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.3.0-alpha.10.tgz#31909d4dc99e1c406cb36c785cdaa23b1d7fc77b"
   dependencies:
     app-root-path "^2.0.1"
     buffer "^5.1.0"
@@ -3553,9 +3553,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vesper@^0.1.9:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/vesper/-/vesper-0.1.9.tgz#57c14d41fe47760df860cafd9b590802ded177dd"
+vesper@^0.2.0-alpha.2:
+  version "0.2.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/vesper/-/vesper-0.2.0-alpha.2.tgz#32d77eecd3856dea554947ae2ea6c5eed9a72a3b"
   dependencies:
     "@types/body-parser" "^1.16.8"
     "@types/cors" "^2.8.3"
@@ -3580,8 +3580,8 @@ vesper@^0.1.9:
     merge-graphql-schemas "^1.5.1"
     reflect-metadata "^0.1.12"
     subscriptions-transport-ws "^0.9.7"
-    typedi "^0.7.2"
-    typeorm "^0.2.0-alpha.46"
+    typedi "^0.8.0"
+    typeorm "^0.3.0-alpha.0"
     yargonaut "^1.1.2"
     yargs "^11.0.0"
 

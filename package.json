@@ -26,7 +26,7 @@
     "password-validator": "^4.1.1",
     "pg": "^7.4.3",
     "uuid-validate": "^0.0.3",
-    "vesper": "^0.1.9"
+    "vesper": "^0.2.0-alpha.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^2.0.0",

@@ -9,12 +9,14 @@ export class CurrentUser {
   public id?: string;
   public profile?: User;
   public scopes?: Scope[];
+  public expires: number;
 
-  constructor(user: User, scopes: string[]) {
+  constructor(user: User, scopes: string[], expires: number) {
     if (user) {
       this.id = user.id;
       this.profile = user;
     }
+    this.expires = expires;
     this.scopes = [];
     if (scopes) {
       for (const scope of scopes) {

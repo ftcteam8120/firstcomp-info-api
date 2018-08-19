@@ -9,14 +9,15 @@ import { Auth } from './Auth';
 @Service()
 export class JWT {
 
-  public createToken(userId: string, scopes: string[], expiresIn: number): Auth {
+  public createToken(user: User, scopes: string[], expiresIn: number): Auth {
     const exp = Math.floor(Date.now() / 1000) + expiresIn;
     const token = jwt.sign({
       scopes,
       exp,
-      sub: userId
+      sub: user.id
     }, JWT_SECRET);
     return {
+      user,
       token,
       scopes,
       expires: exp
@@ -32,7 +33,7 @@ export class JWT {
     }
     const entityManager = getManager();
     const user = await entityManager.findOneOrFail(User, { id: data.sub });
-    return new CurrentUser(user, data.scopes);
+    return new CurrentUser(user, data.scopes, data.exp);
   }
 
 }

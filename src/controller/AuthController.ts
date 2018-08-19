@@ -27,7 +27,7 @@ export class AuthController {
         // Load the user role
         const userRole = await this.scopeTools.findRole(user.role || 'user');
         // Create the JWT with an expiration in a week
-        return this.jwt.createToken(user.id, userRole.scopes, (60 * 60 * 24 * 7));
+        return this.jwt.createToken(user, userRole.scopes, (60 * 60 * 24 * 7));
       });
     });
   }
@@ -38,7 +38,8 @@ export class AuthController {
     const currentUser: CurrentUser = context.container.get(CurrentUser);
     return {
       isLoggedIn: currentUser.id !== undefined,
-      user: currentUser.profile
+      user: currentUser.profile,
+      expires: currentUser.expires
     };
   }
 

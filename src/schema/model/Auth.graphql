@@ -2,4 +2,5 @@ type Auth {
   scopes: [String]
   token: String
   expires: Int
+  user: User
 }

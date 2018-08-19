@@ -1,4 +1,5 @@
 type AuthState {
   isLoggedIn: Boolean
   user: User
+  expires: Int
 }
