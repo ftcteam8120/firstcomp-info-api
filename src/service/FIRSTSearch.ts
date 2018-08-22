@@ -8,6 +8,7 @@ import { Season, SeasonFilter, SeasonOrder } from '../entity/Season';
 import { Country, CountryFilter, CountryOrder } from '../entity/Country';
 import { TOAEvent } from './TheOrangeAlliance';
 import { Location } from 'graphql';
+import * as _ from 'lodash';
 
 export interface DateRange {
   gt: string;
@@ -40,6 +41,46 @@ export class FIRSTSearch {
     private elasticSearch: ElasticSearch,
     private idGenerator: IDGenerator
   ) { }
+
+  private async getAllSeasons(): Promise<Season[]> {
+    const cached = await this.redisCache.get<Season[]>('FIRSTSeasons');
+    if (cached) return cached;
+    return this.elasticSearch.query('https://es01.usfirst.org/seasons/_search', {
+      size: 1000
+    }).then((result: ElasticResult) => {
+      if (result.totalCount === 0) {
+        return [];
+      }
+      const seasons = [];
+      for (const hit of result.hits) {
+        seasons.push(this.convertSeason(this.idGenerator.season(hit.id), hit));
+      }
+      // Cache the season
+      return this.redisCache.setKey('FIRSTSeasons', seasons).then(() => {
+        return seasons;
+      });
+    });
+  }
+
+  private async getAllCountries(): Promise<Country[]> {
+    const cached = await this.redisCache.get<Country[]>('FIRSTCountries');
+    if (cached) return cached;
+    return this.elasticSearch.query('https://es01.usfirst.org/countries/_search', {
+      size: 1000
+    }).then((result: ElasticResult) => {
+      if (result.totalCount === 0) {
+        return [];
+      }
+      const countries = [];
+      for (const hit of result.hits) {
+        countries.push(this.convertCountry(this.idGenerator.country(hit.iso_country_code), hit));
+      }
+      // Cache the season
+      return this.redisCache.setKey('FIRSTCountries', countries).then(() => {
+        return countries;
+      });
+    });
+  }
 
   private convertAll<T>(
     result: ElasticResult,
@@ -401,42 +442,13 @@ export class FIRSTSearch {
   }
 
   public async findSeason(id: string): Promise<Season> {
-    // Check for a cached value
-    const cached = await this.redisCache.get<Season>(id);
-    const seasonData = this.idGenerator.decodeSeason(id);
-    if (cached) return cached;
-    return this.elasticSearch.query('https://es01.usfirst.org/seasons/_search', {
-      query: {
-        query_string: {
-          query: `id: ${seasonData.internalId}`
-        }
-      }
-    }).then((result: ElasticResult) => {
-      if (result.totalCount === 0) {
-        return null;
-      }
-      const seasonRaw = result.hits[0];
-      const season = this.convertSeason(id, seasonRaw);
-      // Cache the season
-      return this.redisCache.set(season).then(() => {
-        return season;
-      });
-    });
+    const seasons = await this.getAllSeasons();
+    return _.find(seasons, { id });
   }
 
-  public findSeasonByYear(program: Program, year: number): Promise<Season> {
-    return this.elasticSearch.query('https://es01.usfirst.org/seasons/_search', {
-      query: this.elasticSearch.buildQuery({
-        program_code: program,
-        season_year_start: year
-      })
-    }).then((result: ElasticResult) => {
-      if (result.totalCount === 0) {
-        return null;
-      }
-      const seasonRaw = result.hits[0];
-      return this.convertSeason(this.idGenerator.season(seasonRaw.id), seasonRaw);
-    });
+  public async findSeasonByYear(program: Program, year: number): Promise<Season> {
+    const seasons = await this.getAllSeasons();
+    return _.find(seasons, { program, startYear: year });
   }
 
   public findSeasons(
@@ -472,27 +484,8 @@ export class FIRSTSearch {
   }
 
   public async findCountry(id: string): Promise<Country> {
-    // Check for a cached value
-    const cached = await this.redisCache.get<Country>(id);
-    const countryData = this.idGenerator.decodeCountry(id);
-    if (cached) return cached;
-    return this.elasticSearch.query('https://es01.usfirst.org/countries/_search', {
-      query: {
-        query_string: {
-          query: `first_country_code: ${countryData.code}`
-        }
-      }
-    }).then((result: ElasticResult) => {
-      if (result.totalCount === 0) {
-        return null;
-      }
-      const countryRaw = result.hits[0];
-      const country = this.convertCountry(id, countryRaw);
-      // Cache the country
-      return this.redisCache.set(country).then(() => {
-        return country;
-      });
-    });
+    const countries = await this.getAllCountries();
+    return _.find(countries, { id });
   }
 
   public findCountries(

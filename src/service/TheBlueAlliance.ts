@@ -347,6 +347,8 @@ export class TheBlueAlliance  {
   }
 
   public async findTeams(event: Event): Promise<Team[]> {
+    const cached = await this.redisCache.get<Team[]>('event-' + event.id + '-teams');
+    if (cached) return cached;
     return this.request(
       'event/' + event.season + event.code.toLowerCase() +
       '/teams'
@@ -368,8 +370,12 @@ export class TheBlueAlliance  {
         }
       }
       // Remove duplicates
-      return _.uniqBy(teams, (t) => {
+      const unduplicated = _.uniqBy(teams, (t) => {
         return t.id;
+      });
+      // Cache the event teams
+      return this.redisCache.setKey('event-' + event.id + '-teams', unduplicated).then(() => {
+        return unduplicated;
       });
     });
   }

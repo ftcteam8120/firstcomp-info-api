@@ -65,7 +65,10 @@ export class GoogleMaps {
     const cached = await this.redisCache.get<string>(event.id + '-photourl-' + index.toString());
     if (cached) return cached;
     const placeId = await this.getEventPlaceId(event);
+    if (!placeId) return null;
     const details = await this.getPlaceDetails(placeId);
+    if (!details) return null;
+    if (!details.photos) return null;
     if (details.photos.length > 0) {
       if (!details.photos[index]) i = 0;
       const photoUrl = new URL('https://maps.googleapis.com/maps/api/place/photo');
