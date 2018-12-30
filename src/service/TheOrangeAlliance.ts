@@ -58,6 +58,7 @@ export class TheOrangeAlliance {
   private async request(url: string) {
     return fetch(TOA_URL + url, {
       headers: {
+        'Content-Type': 'application/json',
         'X-Application-Origin': TOA_APP,
         'X-TOA-Key': TOA_KEY
       }
@@ -126,6 +127,7 @@ export class TheOrangeAlliance {
 
   private convertEvent(id: string, data: TOAEvent): Event {
     const decoded = this.idGenerator.decodeEvent(id);
+    if (data) return null;
     return {
       id,
       code: decoded.code,
@@ -146,9 +148,7 @@ export class TheOrangeAlliance {
 
   public async findEvent(id: string): Promise<Event> {
     const decoded = this.idGenerator.decodeEvent(id);
-    return this.request(
-      'event/' + decoded.code
-    ).then((rawEvents: any[]) => {
+    return this.request(`event/${decoded.code}`).then((rawEvents: any[]) => {
       if (!rawEvents[0]) return null;
       return this.convertEvent(id, rawEvents[0]);
     });
@@ -262,11 +262,7 @@ export class TheOrangeAlliance {
   public async findTeams(event: Event): Promise<Team[]> {
     const toaId = await this.findTOAId(event);
     if (!toaId) return [];
-    return this.request(
-      'event/' +
-      toaId +
-      '/teams'
-    ).then((rawTeams: any[]) => {
+    return this.request(`event/${toaId}/teams`).then((rawTeams: any[]) => {
       const teams: Team[] = [];
       for (const team of rawTeams) {
         teams.push(this.convertTeam(
@@ -276,6 +272,8 @@ export class TheOrangeAlliance {
         ));
       }
       return teams;
+    }).catch(() => {
+      return [];
     });
   }
 

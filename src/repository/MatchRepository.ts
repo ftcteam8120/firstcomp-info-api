@@ -114,7 +114,7 @@ export class MatchRepository {
         orders.push(split[1].toLowerCase());
       }
       // Order last
-      matches = _.orderBy(matches, orderFields, orders);
+      matches = _.orderBy(matches, orderFields, orders as any);
     }
     return {
       totalCount: matches.length,

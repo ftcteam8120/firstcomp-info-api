@@ -178,7 +178,7 @@ export class EventRepository {
         orders.push(split[1].toLowerCase());
       }
       // Order last
-      divisions = _.orderBy(divisions, orderFields, orders);
+      divisions = _.orderBy(divisions, orderFields, orders as any);
     }
     return {
       totalCount: divisions.length,

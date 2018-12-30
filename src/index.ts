@@ -108,14 +108,14 @@ bootstrap({
     DateTime: GraphQLDateTime
   },
   playground: process.env.NODE_ENV !== 'prod',
-  schemas: [__dirname + '/schema/**/*.graphql'],
+  schemas: [`${__dirname}/schema/**/*.graphql`],
   cors: true,
   authorizationChecker: async (scopes: string[], action: Action) => {
     // Get the current user from the container
     const currentUser = action.container.get(CurrentUser);
     // Make sure that the current user has all required scopes
     if (!currentUser.hasScopes(scopes)) {
-      throw new Error('Missing required scopes ' + scopes);
+      throw new Error(`Missing required scopes ${scopes}`);
     }
   },
   setupContainer: async (container, action) => {

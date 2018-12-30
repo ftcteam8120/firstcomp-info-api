@@ -198,7 +198,7 @@ export class EventResolver {
         orders.push(split[1].toLowerCase());
       }
       // Order last
-      teams = _.orderBy(teams, orderFields, orders);
+      teams = _.orderBy(teams, orderFields, orders as any);
     }
     return this.paginator.paginate({
       totalCount: teams.length,
